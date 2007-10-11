@@ -31,10 +31,12 @@ PreferencesController.prototype = {
             theWindow = aWindow;
         }
         
-        var listbox = theWindow.document.getElementById('existingXSSstrings');
+        var listbox = theWindow.document.getElementById('existingSQLIstrings');
+        
         while(listbox.hasChildNodes()){
             listbox.removeChild(listbox.firstChild);
         }
+        
         for(var i = 0; i < attacks.length; i++){
                 var listitem = document.createElement('listitem');
                 listitem.setAttribute('label', attacks[i].string);
@@ -44,7 +46,7 @@ PreferencesController.prototype = {
     }
     ,
     removeAttack: function(){
-        var listbox = document.getElementById('existingXSSstrings');
+        var listbox = document.getElementById('existingSQLIstrings');
         var selectedAttacks = listbox.selectedItems;
         getAttackStringCointainer();
         var attacks = attackStringContainer.getAttacks();
@@ -90,7 +92,7 @@ PreferencesController.prototype = {
         dump(xml);dump('\n');
 
         var nsIFilePicker = Components.interfaces.nsIFilePicker;
-        var picker = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+        var picker = Components.classes['@mozilla.org/filepicker;1'].createInstance(nsIFilePicker);
         picker.init(window, "Select File To Export To", nsIFilePicker.modeSave);
         var resultOfPicker = picker.show();
         if (resultOfPicker == nsIFilePicker.returnCancel){
@@ -193,7 +195,7 @@ PreferencesController.prototype = {
     }
     ,
     moveItemUp: function(){
-        var listbox = document.getElementById('existingXSSstrings');
+        var listbox = document.getElementById('existingSQILstrings');
         var attackStringContainer = getAttackStringCointainer();
 
         if (listbox.selectedItems.length != 1){
@@ -216,7 +218,7 @@ PreferencesController.prototype = {
     }
     ,
     moveItemDown: function(){
-        var listbox = document.getElementById('existingXSSstrings');
+        var listbox = document.getElementById('existingSQLIstrings');
         var attackStringContainer = getAttackStringCointainer();
 
         if (listbox.selectedItems.length != 1){

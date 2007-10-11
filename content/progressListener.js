@@ -6,7 +6,7 @@ const STATE_IS_DOCUMENT = Components.interfaces.nsIWebProgressListener.STATE_IS_
 const LISTEN_ON_WINDOW = 1;
 const LISTEN_ON_DOCUMENT = 2;
 
-function xssmeProgressListener(funcToCall, listenOn) {
+function sqlimeProgressListener(funcToCall, listenOn) {
     
     this.func = funcToCall
     this.listenOn = listenOn != null ? listenOn : STATE_IS_WINDOW;
@@ -14,7 +14,7 @@ function xssmeProgressListener(funcToCall, listenOn) {
     this.interfaceName = "nsIWebProgressListener";
 };
 
-xssmeProgressListener.prototype =
+sqlimeProgressListener.prototype =
 {
     QueryInterface: function(aIID)
     {

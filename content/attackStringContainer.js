@@ -12,7 +12,7 @@ AttackStringContainer.prototype = {
                 getService(Components.interfaces.nsIPrefService);
         var attackStrings;
         
-        this.prefBranch = prefService.getBranch('extensions.xssme.');
+        this.prefBranch = prefService.getBranch('extensions.sqlime.');
         attackStrings = this.prefBranch.getCharPref('attacks');
         this.strings = JSON.fromString(attackStrings);
 

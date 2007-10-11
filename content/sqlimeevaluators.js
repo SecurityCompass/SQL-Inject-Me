@@ -1,5 +1,5 @@
 /**
- * xssmeevaluators.js
+ * sqlimeevaluators.js
  * This file holds a number of JS evaluators 
  * @require Results.js
  */
@@ -8,7 +8,7 @@ function checkForVulnerableElement(document) {
     
     var rv = null;
     
-    dump('xssmeevaluator on page ' + document.location + ' is ' + (document.wrappedJSObject.vulnerable ) + ' ' + (document.wrappedJSObject.vulnerable == true) + '\n');
+    dump('sqlimeevaluator on page ' + document.location + ' is ' + (document.wrappedJSObject.vulnerable ) + ' ' + (document.wrappedJSObject.vulnerable == true) + '\n');
     
     if (document.wrappedJSObject.vulnerable && document.wrappedJSObject.vulnerable == true){
         

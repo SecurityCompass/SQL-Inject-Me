@@ -9,10 +9,10 @@
         buttonlabelcancel="Cancel"
         ondialogaccept="return checkOK();"
         ondialogcancel="return checkCancel();">
-<script type="application/x-javascript" src="chrome://xssme/content/json.js" />
-<script type="application/x-javascript;version=1.7" src="chrome://xssme/content/attackStringContainer.js" />
-<script type="application/javascript;version=1.7" src="chrome://xssme/content/preferences.js" />
-<script type="application/javascript;version=1.7" src="chrome://xssme/content/addAttack.js" />
+<script type="application/x-javascript" src="chrome://sqlime/content/json.js" />
+<script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/attackStringContainer.js" />
+<script type="application/javascript;version=1.7" src="chrome://sqlime/content/preferences.js" />
+<script type="application/javascript;version=1.7" src="chrome://sqlime/content/addAttack.js" />
 <description value="Please enter an attack string and a signature (an id by which we can attribute the string to you, ex. your name)" />
 <label value="Attack String" control="attackstringtxtbox" />
 <textbox id="attackstringtxtbox" />
