@@ -18,8 +18,8 @@ function onOk() {
         return false;
     }
     
-    if (attackStrContainer.addAttack(stringTxtBox.value, sigTxtBox.value)){
-        prefController.makeUI(attackStrContainer.getAttacks(), prefWindow);
+    if (attackStrContainer.addString(stringTxtBox.value, sigTxtBox.value)){
+        prefController.makeUI(attackStrContainer.getStrings(), prefWindow);
         return true;
     }
     else{

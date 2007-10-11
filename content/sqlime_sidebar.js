@@ -53,10 +53,10 @@ extension.prototype = {
         var testTypeInfo = new Object();
         testTypeInfo.type = typeOfTest;
         if (typeOfTest == TestType_AllTestsForForm) {
-            testTypeInfo.count = getAttackStringCointainer().getAttacks().length;
+            testTypeInfo.count = getAttackStringCointainer().getStrings().length;
         }
         else if (typeOfTest == TestType_PrefNumTestsForForm) {
-            var numAttacks = getAttackStringCointainer().getAttacks().length;
+            var numAttacks = getAttackStringCointainer().getStrings().length;
             var preferedNumAttacks = this.getPreferredNumberOfAttacks();
             
             testTypeInfo.count = (preferedNumAttacks > numAttacks) ? numAttacks : preferedNumAttacks;
@@ -114,7 +114,7 @@ extension.prototype = {
                         {
                             
                             var testValue = getAttackStringCointainer().
-                                    getAttacks()[testIndex];
+                                    getStrings()[testIndex];
                             var testRunner = new AttackRunner();
                             
                             
@@ -143,7 +143,7 @@ extension.prototype = {
                 var tabbox = document.getElementById('sidebarformtabbox');
                 var htmlDoc = getMainHTMLDoc();
                 var numberOfForms = htmlDoc.forms.length;
-                var numberOfTests = getAttackStringCointainer().getAttacks().
+                var numberOfTests = getAttackStringCointainer().getStrings().
                         length;
                 
                 for (var formIndex = 0; formIndex < numberOfForms; formIndex++){
@@ -163,7 +163,7 @@ extension.prototype = {
                         {
                             
                             var testValue = getAttackStringCointainer().
-                                    getAttacks()[testIndex];
+                                    getStrings()[testIndex];
                             var testRunner = new TestRunner();
                             
                             dump('running test on field ' + elementObjet.index 
@@ -205,7 +205,7 @@ extension.prototype = {
                         {
                             
                             var testValue = getAttackStringCointainer().
-                                    getAttacks()[testIndex];
+                                    getStrings()[testIndex];
                             var testRunner = new TestRunner();
                             
                             dump('running test on field ' + elementObjet.index + ' with value ' + testValue + '\n');
@@ -557,7 +557,7 @@ function createFieldUI(node){
     
     dump("creating field ui............................\n");
     var attackStringContainer = getAttackStringCointainer();
-    var attacks = attackStringContainer.getAttacks();
+    var attacks = attackStringContainer.getStrings();
     for (var i = 0; i < attacks.length; i++){
         var aMenuItem = document.createElement("menuitem");
         aMenuItem.setAttribute("label", attacks[i].string);

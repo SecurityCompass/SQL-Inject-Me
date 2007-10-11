@@ -12,7 +12,7 @@ PreferencesController.prototype = {
     init: function(){
         getAttackStringCointainer();
         
-        var attacks = attackStringContainer.getAttacks();
+        var attacks = attackStringContainer.getStrings();
         if (attacks.length) {
             this.makeUI(attacks);
         }
@@ -49,7 +49,7 @@ PreferencesController.prototype = {
         var listbox = document.getElementById('existingSQLIstrings');
         var selectedAttacks = listbox.selectedItems;
         getAttackStringCointainer();
-        var attacks = attackStringContainer.getAttacks();
+        var attacks = attackStringContainer.getStrings();
         for (var i = 0; i < selectedAttacks.length; i++){
             attacks[selectedAttacks[i].value] = null;
         }
@@ -64,7 +64,7 @@ PreferencesController.prototype = {
             }
         }
         attackStringContainer.save();
-        this.makeUI(attackStringContainer.getAttacks());
+        this.makeUI(attackStringContainer.getStrings());
     }
     ,
     exportAttacks: function(){
@@ -72,7 +72,7 @@ PreferencesController.prototype = {
         var root = exportDoc.createElement('exportedattacks');
         var xmlAttacks = exportDoc.createElement('attacks');
         getAttackStringCointainer();
-        var attacks = attackStringContainer.getAttacks();
+        var attacks = attackStringContainer.getStrings();
         for each (var attack in attacks){
             var xmlAttack = exportDoc.createElement('attack');
             var xmlString = exportDoc.createElement('attackString');
@@ -164,7 +164,7 @@ PreferencesController.prototype = {
                 }
                 if (stringTag === null || sigTag === null){
                     alert("Couldn't import attack. Couldn't find stringAttack or signature tags. Error while processing the document. ");
-                    this.makeUI(attackStringContainer.getAttacks(), window); // just in case.
+                    this.makeUI(attackStringContainer.getStrings(), window); // just in case.
                     return false;
                 }
                 else{
@@ -174,13 +174,13 @@ PreferencesController.prototype = {
                         stringTag.firstChild.nodeName === '#text')
                     {
                         
-                        attackStringContainer.addAttack(
+                        attackStringContainer.addString(
                             stringTag.firstChild.nodeValue,
                             sigTag.firstChild.nodeValue);
                     }
                     else {
                         alert("Couldn't import attack. attackString or signature tag does not have just one text node. Error while processing the document. ");
-                        this.makeUI(attackStringContainer.getAttacks(), window); // just in case.
+                        this.makeUI(attackStringContainer.getStrings(), window); // just in case.
                         return false;
                     }
                 }
@@ -190,12 +190,12 @@ PreferencesController.prototype = {
             alert("Couldn't find any attacks. No Attacks imported.");
             return false;            
         }
-        this.makeUI(attackStringContainer.getAttacks(), window);
+        this.makeUI(attackStringContainer.getStrings(), window);
         return true;
     }
     ,
     moveItemUp: function(){
-        var listbox = document.getElementById('existingSQILstrings');
+        var listbox = document.getElementById('existingSQLIstrings');
         var attackStringContainer = getAttackStringCointainer();
 
         if (listbox.selectedItems.length != 1){
@@ -211,7 +211,7 @@ PreferencesController.prototype = {
         attackStringContainer.swap(listbox.selectedItem.value, 
             listbox.selectedItem.previousSibling.value);
         attackStringContainer.save();
-        this.makeUI(attackStringContainer.getAttacks(), window);
+        this.makeUI(attackStringContainer.getStrings(), window);
         
         return true;
 
@@ -227,7 +227,7 @@ PreferencesController.prototype = {
         }
         
         if (listbox.selectedItem.value == 
-            (attackStringContainer.getAttacks().length - 1) )
+            (attackStringContainer.getStrings().length - 1) )
         {
             alert("sorry, can't move this item up any further");
             return false;
@@ -236,7 +236,7 @@ PreferencesController.prototype = {
         attackStringContainer.swap(listbox.selectedItem.value, 
             listbox.selectedItem.nextSibling.value);
         attackStringContainer.save();
-        this.makeUI(attackStringContainer.getAttacks(), window);
+        this.makeUI(attackStringContainer.getStrings(), window);
         
         return true;
     }

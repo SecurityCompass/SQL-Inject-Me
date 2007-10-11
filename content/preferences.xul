@@ -15,9 +15,15 @@
         </preferences>
         <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/json.js" />
         <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/io.js" />
+        <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/preferenceStringContainer.js" />
         <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/attackStringContainer.js" />
         <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/preferences.js" />
+        <hbox>
+            <button label="export" oncommand="preferencesController.exportAttacks()" />
+            <button label="import" oncommand="preferencesController.importAttacks()" />
+        </hbox>
         <groupbox>
+            <caption label="SQL Injection Strings" />
             <label style="visibility:hidden;color: red" value="No attacks, please enter some" id="noattackslbl" />
             <hbox>
                 <listbox id="existingSQLIstrings" rows="10" seltype="multiple">
@@ -27,10 +33,22 @@
                     <button label="down" oncommand="preferencesController.moveItemDown()"/>
                     <button label="add" oncommand="window.openDialog('chrome://sqlime/content/addAttack.xul', 'attackstring', 'chrome', attackStringContainer, preferencesController, window)"/>
                     <button label="remove" oncommand="preferencesController.removeAttack()"/>
-                    <button label="export" oncommand="preferencesController.exportAttacks()" />
-                    <button label="import" oncommand="preferencesController.importAttacks()" />
                 </vbox>
             </hbox>
+        </groupbox>
+        <groupbox>
+            <caption label="Result Strings" />
+            <description>
+                Result Strings are strings that are found in pages where the result is submitted and signify that the test has FAILED.
+            </description>
+            <listbox id="existingSQLIerrStrings" rows="10" seltype="multiple">
+            </listbox>
+            <vbox>
+                <button label="up" oncommand="preferencesController.moveErrorStringUp()"/>
+                <button label="down" oncommand="preferencesController.moveeErrorStringDown()"/>
+                <button label="add" oncommand="window.openDialog('chrome://sqlime/content/addAttack.xul', 'attackstring', 'chrome', attackStringContainer, preferencesController, window)"/>
+                <button label="remove" oncommand="preferencesController.removeAttack()"/>
+                </vbox>
         </groupbox>
     </prefpane>
     <script>
