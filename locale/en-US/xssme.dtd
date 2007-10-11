@@ -1,0 +1,5 @@
+<!ENTITY xssme.label "Your localized menuitem">
+<!ENTITY xssmeContext.label "Your Menuitem">
+<!ENTITY xssmeContext.accesskey "Y">
+<!ENTITY xssmeToolbar.label "Your Toolbar Button">
+<!ENTITY xssmeToolbar.tooltip "This is your toolbar button!">

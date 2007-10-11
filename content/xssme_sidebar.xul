@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://xssme/skin/xssme_sidebar.css" type="text/css"?>
+<window
+    id="sidebar"
+    title="XSS Me"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+    xmlns:html="http://www.w3.org/1999/xhtml" >
+    <script type="application/x-javascript;version=1.7" 
+            src="chrome://xssme/content/progressListener.js" />
+    <script type="application/x-javascript;version=1.7" 
+            src="chrome://xssme/content/tabbrowsermanager.js" />
+    <script type="application/x-javascript;version=1.7" 
+            src="chrome://xssme/content/attackStringContainer.js" />
+    <script type="application/x-javascript;version=1.7"
+            src="chrome://xssme/content/Results.js" />
+    <script type="application/x-javascript;version=1.7" 
+            src="chrome://xssme/content/ResultsManager.js" />
+    <script type="application/x-javascript;version=1.7"
+            src="chrome://xssme/content/json.js" />
+    <script type="application/x-javascript;version=1.7" 
+            src="chrome://xssme/content/attackStringContainer.js" />
+    <script type="application/x-javascript;version=1.7" 
+            src="chrome://xssme/content/AttackRunner.js" />
+    <script type="application/x-javascript;version=1.7" 
+            src="chrome://xssme/content/xssmeevaluators.js" />
+    <script type="application/x-javascript;version=1.7" 
+            src="chrome://xssme/content/xssme_sidebar.js"/>
+    <commandset>
+        <command id="xssme_generate_form_ui" oncommand="setTimeout(function(){xssmeExtension.do_generate_form_ui()}, 1);" />
+        <command id="xssme_do_test" oncommand="xssmeExtension.run_tests(event)" />
+    </commandset>
+    <box><image src="chrome://xssme/skin/logo_sc.png" /> </box>
+    <label style="font-size: xx-large" class="title">XSS Me</label>
+    <vbox style="overflow:auto;" flex="1">
+        <description>
+            XSS Me lets you test the page you're viewing for Cross Site Scripting vulnerabilities.
+        </description>
+        <description>
+            Each tab represents a form on the page and lists all the fields. Just fill in good values for all the fields and mark which ones are to be tested (they will become yellow) then click either "Test with All Attacks" or "Test with Top Attacks".
+        </description>
+        <spacer height="5px" />
+        <hbox>
+            <vbox id="xssmetestbuttonbox"  align="start" flex="0" >
+                <button label="Test all forms with all attacks" crop="right" id='test_all_forms_with_all_attacks' command="xssme_do_test" />
+                <button label="Test all forms with top attacks" crop="right" id='test_all_forms_with_top_attacks' command="xssme_do_test" />
+            </vbox>
+        </hbox>
+        <spacer style="height: 5px" />
+        <box id="xssme_here_be_tabs" pack="start" align="start" >
+        </box>
+        <spacer flex="1" />
+    </vbox>
+    <script>
+        window.addEventListener("load", function() {
+        xssmeExtension = new extension();
+        xssmeExtension.addAllMainWindowEventListeners();
+        document.getElementById('xssme_generate_form_ui').doCommand();}, 
+                true);
+            
+        window.addEventListener("unload", 
+            function() { xssmeExtension.removeAllMainWindowEventListeners()}, 
+                true); // This should limit leaks
+    </script>
+</window>

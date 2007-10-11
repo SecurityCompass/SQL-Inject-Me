@@ -1,0 +1,23 @@
+.failed {
+    color: red;
+}
+
+.passed {
+    color: green;
+}
+
+.warning {
+    color: #AAAA00;
+}
+
+p {
+    margin: 0;
+}
+
+.testfields {
+    list-style: none;
+}
+
+.title {
+    color: #405068 !important;
+}

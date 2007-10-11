@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://xssme/skin/xssme_sidebar.css" type="text/css"?>
+<prefwindow id="xssmePreferences" title="XSS ME Options"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    <prefpane label="General" id="xssgen" >
+        <preferences>
+            <preference id="preferedNumAttacks" name="extensions.xssme.prefnumattacks" type="int"/>
+        </preferences>
+        <label value="Prefered Number of Attacks to Test" control="preferedNumAttacksTxtBox" />
+        <textbox id="preferedNumAttacksTxtBox" preference="preferedNumAttacks" />
+    </prefpane>
+    <prefpane label="XSS Strings" id="xssstrings">
+        <preferences>
+        </preferences>
+        <script type="application/x-javascript;version=1.7" src="chrome://xssme/content/json.js" />
+        <script type="application/x-javascript;version=1.7" src="chrome://xssme/content/io.js" />
+        <script type="application/x-javascript;version=1.7" src="chrome://xssme/content/attackStringContainer.js" />
+        <script type="application/x-javascript;version=1.7" src="chrome://xssme/content/preferences.js" />
+        <groupbox>
+            <label style="visibility:hidden;color: red" value="No attacks, please enter some" id="noattackslbl" />
+            <hbox>
+                <listbox id="existingXSSstrings" rows="10" seltype="multiple">
+                </listbox>
+                <vbox>
+                    <button label="up" oncommand="preferencesController.moveItemUp()"/>
+                    <button label="down" oncommand="preferencesController.moveItemDown()"/>
+                    <button label="add" oncommand="window.openDialog('chrome://xssme/content/addAttack.xul', 'attackstring', 'chrome', attackStringContainer, preferencesController, window)"/>
+                    <button label="remove" oncommand="preferencesController.removeAttack()"/>
+                    <button label="export" oncommand="preferencesController.exportAttacks()" />
+                    <button label="import" oncommand="preferencesController.importAttacks()" />
+                </vbox>
+            </hbox>
+        </groupbox>
+    </prefpane>
+    <script>
+        window.addEventListener("load", function(){preferencesController = new PreferencesController()}, false);
+    </script>
+</prefwindow>
