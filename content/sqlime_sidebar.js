@@ -254,7 +254,7 @@ extension.prototype = {
         rv.menupopup= menupopup;
      
         button.setAttribute('label', "Execute");
-        button.setAttribute('command', 'xssme_do_test');
+        button.setAttribute('command', 'sqlime_do_test');
         button.className = 'run_form_test';
         
         menulist.setAttribute('class', 'TestType');
@@ -293,7 +293,7 @@ extension.prototype = {
     do_generate_form_ui: function() {
         var q = 0;
         var maindoc = getMainWindow().document.getElementById('content').contentDocument;
-        var box = document.getElementById('xssme_here_be_tabs');
+        var box = document.getElementById('sqlime_here_be_tabs');
         var docforms = maindoc.getElementsByTagName('form');
         var unnamedFormCounter = 0; //used for generating the unnamed form names 
         var tabbox = document.createElement('tabbox');
@@ -456,7 +456,7 @@ extension.prototype = {
                 addEventListener("TabSelect", 
                 function(){ourCaller.do_generate_form_ui()}, false);
         
-        this.plistener = new xssmeProgressListener(
+        this.plistener = new sqlimeProgressListener(
             function(){ourCaller.do_generate_form_ui()});
         
         mainWindow.document.getElementById('content').
@@ -476,7 +476,7 @@ extension.prototype = {
     getPreferredNumberOfAttacks: function(){
         var prefs = Components.classes["@mozilla.org/preferences-service;1"].
             getService(Components.interfaces.nsIPrefService);
-        var branch = prefs.getBranch("extensions.xssme.");
+        var branch = prefs.getBranch("extensions.sqlime.");
         return branch.getIntPref("prefnumattacks");   
     }
  }
