@@ -1,5 +1,5 @@
-content	xssme	content/
-locale	xssme	en-US	locale/en-US/
-skin	xssme	classic/1.0	skin/
-overlay	chrome://browser/content/browser.xul	chrome://xssme/content/overlay.xul
-style	chrome://global/content/customizeToolbar.xul	chrome://xssme/skin/overlay.css
+content	sqlime	content/
+locale	sqlime	en-US	locale/en-US/
+skin	sqlime	classic/1.0	skin/
+overlay	chrome://browser/content/browser.xul	chrome://sqlime/content/overlay.xul
+style	chrome://global/content/customizeToolbar.xul	chrome://sqlime/skin/overlay.css

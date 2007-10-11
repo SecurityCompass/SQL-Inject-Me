@@ -6,8 +6,14 @@
     <menupopup id="menu_ToolsPopup">
         <menu id="sqlime-tools" label="SQL Inject ME"  insertafter="devToolsSeparator" accesskey="x">
             <menupopup>
-                <menuitem label="Open SQL Inject Me Sidebar" observes="openSQLIMeSidebar" />
-                <menuitem label="&sqlime.options;" oncommand="window.openDialog('chrome://sqlime/content/preferences.xul')" />
+                <menuitem 
+                        label="Open SQL Inject Me Sidebar" 
+                        observes="openSQLIMeSidebar" 
+                />
+                <menuitem 
+                          label="&sqlime.options;" 
+                          oncommand="window.openDialog('chrome://sqlime/content/preferences.xul')" 
+                />
                 <menuitem label="&sqlime.about;" oncommand="window.openDialog('chrome://sqlime/content/about.xul');" />
                 <menuitem label="&sqlime.help;" oncommand="window.open('http://www.securitycompass.com', 'helpwindow', '');" />  
                 <menuseparator />

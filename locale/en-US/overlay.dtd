@@ -1,15 +1,15 @@
-<!ENTITY xssme.tools "XSS Me">
-<!ENTITY xssme.toolx "XSS Me">
-<!ENTITY xssme.open "Open XSS ME">
-<!ENTITY xssme.helppage "http://www.securitycompass.com/xssme.html">
-<!ENTITY xssme.help "Help">
-<!ENTITY xssme.about "About">
-<!ENTITY xssme.options "Options">
-<!ENTITY xssme.encoding "Encoding">
-<!ENTITY xssme.random "Random">
-<!ENTITY xssme.encoding.none "None">
-<!ENTITY xssme.encoding.unicode "Unicode">
-<!ENTITY xssme.encoding.html "HTML">
-<!ENTITY xssme.encoding.hex "Hex">
-<!ENTITY xssme.encoding.doublehex "Double Hex">
-<!ENTITY xssme.cookies "Cookies">
+<!ENTITY sqlime.tools "XSS Me">
+<!ENTITY sqlime.toolx "XSS Me">
+<!ENTITY sqlime.open "Open XSS ME">
+<!ENTITY sqlime.helppage "http://www.securitycompass.com/sqlime.html">
+<!ENTITY sqlime.help "Help">
+<!ENTITY sqlime.about "About">
+<!ENTITY sqlime.options "Options">
+<!ENTITY sqlime.encoding "Encoding">
+<!ENTITY sqlime.random "Random">
+<!ENTITY sqlime.encoding.none "None">
+<!ENTITY sqlime.encoding.unicode "Unicode">
+<!ENTITY sqlime.encoding.html "HTML">
+<!ENTITY sqlime.encoding.hex "Hex">
+<!ENTITY sqlime.encoding.doublehex "Double Hex">
+<!ENTITY sqlime.cookies "Cookies">
