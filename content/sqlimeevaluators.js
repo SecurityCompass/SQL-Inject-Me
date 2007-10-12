@@ -14,8 +14,10 @@ function checkForErrorString(browser) {
     dump('sqlimeevaluators::checkForErrorString browswer._fastFind == ' +browser._fastFind + '\n');
     for each (var error in errorContainer.getStrings()){
         var result;
-        dump('going to check ' + browser.currentURI.spec + ' for \'' + error.string + '\'\n');
+        dump('sqlimeevaluators::checkForErrorString going to check ' + browser.spec + ' with value \'' + browser.webNavigation.document.body.innerHTML + '\' for \'' + error.string + '\'\n');
         try {
+            browser.fastFind.init(browser.docShell);
+            dump('sqlimeevaluators::checkForErrorString browser.fastFind.find(error.string, false) == ' + browser.fastFind.find(error.string, false) + '\n');
             if (browser.fastFind.find(error.string, false) !== Components.interfaces.nsITypeAheadFind.FIND_NOTFOUND) { //, false, true, false, true, false)){
                 
                 result = new Result(RESULT_TYPE_ERROR, 100, "Was able to find error string ('" + error.string + "')");
