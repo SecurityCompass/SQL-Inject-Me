@@ -7,8 +7,6 @@
  *this object is responsible for dealing with the Attack Strings.
  */
 function AttackStringContainer() {
-    this.strings = Array();
-    this.prefBranch = null;
     this.init();
 }
 AttackStringContainer.prototype = new PreferenceStringContainer();
@@ -28,7 +26,7 @@ AttackStringContainer.prototype.init = function (){
     }
     
 
-function getAttackStringCointainer(){
+function getAttackStringContainer(){
     if (typeof(attackStringContainer) === 'undefined' || !attackStringContainer){
         attackStringContainer = new AttackStringContainer();
     }

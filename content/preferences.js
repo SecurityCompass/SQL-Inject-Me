@@ -2,7 +2,6 @@
  * Requires JSON
  * Requires AttackStringContainer
  */
-//alert('ran js');
 
 function PreferencesController() {
     this.init();
@@ -10,28 +9,38 @@ function PreferencesController() {
 
 PreferencesController.prototype = {
     init: function(){
-        getAttackStringCointainer();
+//         getErrorStringContainer();
         
-        var attacks = attackStringContainer.getStrings();
+        var attacks = getAttackStringContainer().getStrings();
+        var errorStrings = getErrorStringContainer().getStrings();
+        
         if (attacks.length) {
-            this.makeUI(attacks);
+            this.makeUI(attacks, null, 'existingSQLIstrings');
         }
         else {
             var label = document.getElementById('noattackslbl');
             label.style.visibility = 'visible';
         }
+        
+        if (errorStrings.length){
+            this.makeUI(errorStrings, null, 'existingSQLIerrStrings');   
+        }
+        else {
+            var label = document.getElementById('noerrorslbl');
+            label.style.visibility = 'visible';
+        }
     }
     ,
-    makeUI: function(attacks, aWindow){
+    makeUI: function(attacks, aWindow, listboxID){
         var theWindow
-        if (typeof(aWindow) === 'undefined' || !aWindow){
+        if (typeof(aWindow) === 'undefined' || aWindow === null || !aWindow){
             theWindow = window;
         }
         else {
             theWindow = aWindow;
         }
         
-        var listbox = theWindow.document.getElementById('existingSQLIstrings');
+        var listbox = theWindow.document.getElementById(listboxID);
         
         while(listbox.hasChildNodes()){
             listbox.removeChild(listbox.firstChild);
@@ -48,7 +57,7 @@ PreferencesController.prototype = {
     removeAttack: function(){
         var listbox = document.getElementById('existingSQLIstrings');
         var selectedAttacks = listbox.selectedItems;
-        getAttackStringCointainer();
+        getAttackStringContainer();
         var attacks = attackStringContainer.getStrings();
         for (var i = 0; i < selectedAttacks.length; i++){
             attacks[selectedAttacks[i].value] = null;
@@ -71,7 +80,7 @@ PreferencesController.prototype = {
         var exportDoc = document.implementation.createDocument("", "", null);
         var root = exportDoc.createElement('exportedattacks');
         var xmlAttacks = exportDoc.createElement('attacks');
-        getAttackStringCointainer();
+        getAttackStringContainer();
         var attacks = attackStringContainer.getStrings();
         for each (var attack in attacks){
             var xmlAttack = exportDoc.createElement('attack');
@@ -137,7 +146,7 @@ PreferencesController.prototype = {
         
         var attacksTag = attacksTags[0];
         var attackTags = new Array();
-        var attackStringContainer = getAttackStringCointainer();
+        var attackStringContainer = getAttackStringContainer();
         
         for (var i = 0; i < attacksTag.childNodes.length; i++){
             
@@ -194,9 +203,17 @@ PreferencesController.prototype = {
         return true;
     }
     ,
-    moveItemUp: function(){
-        var listbox = document.getElementById('existingSQLIstrings');
-        var attackStringContainer = getAttackStringCointainer();
+    moveAttackStringUp: function(){
+        this.moveItemUp(getAttackStringContainer(), 'existingSQLIstrings');   
+    }
+    ,
+    moveErrorStringUp: function(){
+        this.moveItemUp(getErrorStringContainer(), 'existingSQLIerrStrings');   
+    }
+    ,
+    moveItemUp: function(container, listboxID){
+        var listbox = document.getElementById(listboxID);
+        
 
         if (listbox.selectedItems.length != 1){
             alert("sorry, only one item can be moved at a time");
@@ -208,18 +225,25 @@ PreferencesController.prototype = {
             return false;
         }
         
-        attackStringContainer.swap(listbox.selectedItem.value, 
+        container.swap(listbox.selectedItem.value, 
             listbox.selectedItem.previousSibling.value);
-        attackStringContainer.save();
-        this.makeUI(attackStringContainer.getStrings(), window);
+        container.save();
+        this.makeUI(container.getStrings(), window, listboxID);
         
         return true;
 
     }
     ,
-    moveItemDown: function(){
-        var listbox = document.getElementById('existingSQLIstrings');
-        var attackStringContainer = getAttackStringCointainer();
+    moveAttackStringDown: function(){
+        this.moveItemDown(getAttackStringContainer(), 'existingSQLIstrings');   
+    }
+    ,
+    moveErrorStringDown: function(){
+        this.moveItemDown(getErrorStringContainer(), 'existingSQLIerrStrings');
+    }
+    ,
+    moveItemDown: function(container, listboxID){
+        var listbox = document.getElementById(listboxID);
 
         if (listbox.selectedItems.length != 1){
             alert("sorry, only one item can be moved at a time");
@@ -233,10 +257,10 @@ PreferencesController.prototype = {
             return false;
         }
         
-        attackStringContainer.swap(listbox.selectedItem.value, 
-            listbox.selectedItem.nextSibling.value);
-        attackStringContainer.save();
-        this.makeUI(attackStringContainer.getStrings(), window);
+        container.swap(listbox.selectedItem.value, 
+                listbox.selectedItem.nextSibling.value);
+        container.save();
+        this.makeUI(container.getStrings(), window, listboxID);
         
         return true;
     }

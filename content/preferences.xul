@@ -16,6 +16,7 @@
         <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/json.js" />
         <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/io.js" />
         <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/preferenceStringContainer.js" />
+        <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/ErrorStringContainer.js" />
         <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/attackStringContainer.js" />
         <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/preferences.js" />
         <hbox>
@@ -29,7 +30,7 @@
                 <listbox id="existingSQLIstrings" rows="10" seltype="multiple">
                 </listbox>
                 <vbox>
-                    <button label="up" oncommand="preferencesController.moveItemUp()"/>
+                    <button label="up" oncommand="preferencesController.moveAttackStringUp()"/>
                     <button label="down" oncommand="preferencesController.moveItemDown()"/>
                     <button label="add" oncommand="window.openDialog('chrome://sqlime/content/addAttack.xul', 'attackstring', 'chrome', attackStringContainer, preferencesController, window)"/>
                     <button label="remove" oncommand="preferencesController.removeAttack()"/>
@@ -41,14 +42,17 @@
             <description>
                 Result Strings are strings that are found in pages where the result is submitted and signify that the test has FAILED.
             </description>
-            <listbox id="existingSQLIerrStrings" rows="10" seltype="multiple">
-            </listbox>
-            <vbox>
-                <button label="up" oncommand="preferencesController.moveErrorStringUp()"/>
-                <button label="down" oncommand="preferencesController.moveeErrorStringDown()"/>
-                <button label="add" oncommand="window.openDialog('chrome://sqlime/content/addAttack.xul', 'attackstring', 'chrome', attackStringContainer, preferencesController, window)"/>
-                <button label="remove" oncommand="preferencesController.removeAttack()"/>
+            <label style="visibility:hidden;color: red" value="No error strings, please enter some" id="noerrorslbl" />
+            <hbox>
+                <listbox id="existingSQLIerrStrings" rows="10" seltype="multiple">
+                </listbox>
+                <vbox>
+                    <button label="up" oncommand="preferencesController.moveErrorStringUp()"/>
+                    <button label="down" oncommand="preferencesController.moveeErrorStringDown()"/>
+                    <button label="add" oncommand="window.openDialog('chrome://sqlime/content/addAttack.xul', 'attackstring', 'chrome', attackStringContainer, preferencesController, window)"/>
+                    <button label="remove" oncommand="preferencesController.removeAttack()"/>
                 </vbox>
+            </hbox>
         </groupbox>
     </prefpane>
     <script>
