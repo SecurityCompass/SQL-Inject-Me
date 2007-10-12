@@ -19,7 +19,8 @@ function onOk() {
     }
     
     if (attackStrContainer.addString(stringTxtBox.value, sigTxtBox.value)){
-        prefController.makeUI(attackStrContainer.getStrings(), prefWindow);
+        prefController.makeUI(attackStrContainer.getStrings(), prefWindow, 
+                'existingSQLIstrings');
         return true;
     }
     else{

@@ -32,7 +32,7 @@ PreferenceStringContainer.prototype = {
     }
     ,
     addString: function(string, signature) {
-        dump('PreferenceStringContainer::addString: ' + string+ " " + signature + "\n");
+        dump('PreferenceStringContainer::addString: ' + string+ ' ' + signature + '\n');
         if (!string) {
             return false;
         }

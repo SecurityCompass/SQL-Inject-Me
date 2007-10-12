@@ -49,7 +49,7 @@
                 <vbox>
                     <button label="up" oncommand="preferencesController.moveErrorStringUp()"/>
                     <button label="down" oncommand="preferencesController.moveeErrorStringDown()"/>
-                    <button label="add" oncommand="window.openDialog('chrome://sqlime/content/addAttack.xul', 'attackstring', 'chrome', attackStringContainer, preferencesController, window)"/>
+                    <button label="add" oncommand="window.openDialog('chrome://sqlime/content/addError.xul', 'attackstring', 'chrome', errorStringContainer, preferencesController, window)"/>
                     <button label="remove" oncommand="preferencesController.removeAttack()"/>
                 </vbox>
             </hbox>
