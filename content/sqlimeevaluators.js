@@ -5,32 +5,6 @@
  * @require ErrorStringContainer.js
  */
 
-function checkForVulnerableElement(browser) {
-    
-    var rv = null;
-    
-    dump('sqlimeevaluator on page ' + browser.webNavigation.document.location + ' is ' + (browser.webNavigation.document.wrappedJSObject.vulnerable ) + ' ' + (browser.webNavigation.document.wrappedJSObject.vulnerable == true) + '\n');
-    
-    if (browser.webNavigation.document.wrappedJSObject.vulnerable && browser.webNavigation.document.wrappedJSObject.vulnerable == true){
-        
-        rv = new Result(RESULT_TYPE_ERROR, 100, "Was able to add property to DOM, this page is very vulnerable");
-        
-    }
-    else if (browser.webNavigation.document.vulnerable){
-        
-        rv = new Result(RESULT_TYPE_WARNING, 100, "Seemed to add property but not vaule. This should be investigated further");
-        
-    }
-    else {
-        
-        rv = new Result(RESULT_TYPE_PASS, 100, "browser.webNavigation.document did not get property");
-        
-    }
-    
-    return [rv];
-    
-}
-
 function checkForErrorString(browser) {
 
     var errorContainer = getErrorStringContainer();
@@ -40,10 +14,9 @@ function checkForErrorString(browser) {
     dump('sqlimeevaluators::checkForErrorString browswer._fastFind == ' +browser._fastFind + '\n');
     for each (var error in errorContainer.getStrings()){
         var result;
-        var findInstData = new nsFindInstData();
-        dump('going to check ' + browser + ' for \'' + error.string + '\'\n');
+        dump('going to check ' + browser.currentURI.spec + ' for \'' + error.string + '\'\n');
         try {
-            if (browser._fastFind.find(error.string, false) !== Components.interfaces.nsITypeAheadFind.FIND_NOTFOUND) { //, false, true, false, true, false)){
+            if (browser.fastFind.find(error.string, false) !== Components.interfaces.nsITypeAheadFind.FIND_NOTFOUND) { //, false, true, false, true, false)){
                 
                 result = new Result(RESULT_TYPE_ERROR, 100, "Was able to find error string ('" + error.string + "')");
                 
@@ -59,4 +32,29 @@ function checkForErrorString(browser) {
     }
     
     return results;
+}
+
+function checkForServerResponseCode(nsiHttpChannel){
+    try{
+        dump('sqlimeevaluators::checkForServerResponseCode nsiHttpChannel.toString(): ' + nsiHttpChannel.toString() + '\n');
+        dump('sqlimeevaluators::checkForServerResponseCode nsiHttpChannel.responseStatus: ' + nsiHttpChannel.responseStatus + '\n');
+        if ((nsiHttpChannel.responseStatus === undefined || nsiHttpChannel.responseStatus === null)){
+            return null;   
+        }
+        else {
+            var result;
+            var responseCode = nsiHttpChannel.responseStatus;
+            if (responseCode == 200){
+                result = new Result(RESULT_TYPE_PASS, 100, "Server returned OK return code ('" + responseCode + "')");
+            }
+            else {
+                result = new Result(RESULT_TYPE_ERROR, 100, "server returned a bad responseCode (" + responseCode + ", " + nsiHttpChannel.responseStatusText + ")\n" );
+            }
+        }
+        return [result];
+    }
+    catch(err){
+        dump('sqlimeevaluators::checkForServerResponseCode err: ' + err + '\n');
+        return false;
+    }
 }

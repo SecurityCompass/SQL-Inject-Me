@@ -1,6 +1,7 @@
 /**
  * ResultsManager.js
  * @requires Result.js
+ * @requires AttackHttpResponseObserver
  */
 
 /**
@@ -12,10 +13,46 @@ function ResultsManager() {
     this.warnings = new Array();
     this.pass = new Array();
     this.attacks = new Array();
+    this.httpresponseObservers = new Array(); //parallel to this.attacks
 }
 
 ResultsManager.prototype = {
-    
+    addResults: function(results){
+        for each (var result in results){
+            switch(result.type){
+                        
+                case RESULT_TYPE_ERROR:
+                        if (this.errors[result.value] === undefined)
+                {
+                    this.errors[result.value] = new Array();
+                }
+                this.errors[result.value].push(result);
+                break;
+                        
+                case RESULT_TYPE_WARNING:
+                        if (this.warnings[result.value] === undefined)
+                {
+                    this.warnings[result.value] = new Array();
+                }
+                this.warnings[result.value].push(result);
+                break;
+                        
+                        
+                case RESULT_TYPE_PASS:
+                        if (this.pass[result.value] === undefined)
+                {
+                    this.pass[result.value] = new Array();
+                }
+                this.pass[result.value].push(result);
+                break;
+                            
+                default:
+                        dump('resultmanager::evaluate error, result has valid type\n');
+                break;  
+            }
+        }
+    }
+    ,
     evaluate: function(browser, attackRunner){
         
         
@@ -27,39 +64,7 @@ ResultsManager.prototype = {
             for each(var evaluator in this.evaluators){
                 
                 var results = evaluator(browser);
-                for each (var result in results){
-                    switch(result.type){
-                        
-                        case RESULT_TYPE_ERROR:
-                            if (this.errors[result.value] === undefined)
-                            {
-                                this.errors[result.value] = new Array();
-                            }
-                            this.errors[result.value].push(result);
-                            break;
-                        
-                        case RESULT_TYPE_WARNING:
-                            if (this.warnings[result.value] === undefined)
-                            {
-                                this.warnings[result.value] = new Array();
-                            }
-                            this.warnings[result.value].push(result);
-                            break;
-                        
-                        
-                        case RESULT_TYPE_PASS:
-                            if (this.pass[result.value] === undefined)
-                            {
-                                this.pass[result.value] = new Array();
-                            }
-                            this.pass[result.value].push(result);
-                            break;
-                            
-                        default:
-                            dump('resultmanager::evaluate error, result has valid type\n');
-                            break;  
-                      }
-                }
+                this.addResults(results);
                 
             }
             
@@ -137,5 +142,41 @@ ResultsManager.prototype = {
     ,
     registerAttack:function(attackRunner){
         this.attacks.push(attackRunner);
+    }
+    ,
+    addObserver: function(attackRunner, attackHttpResponseObserver){
+        
+        /*
+         * This will cause problems if the attackRunner 
+         */
+        this.httpresponseObservers[this.attacks.indexOf(attackRunner)] = 
+                attackHttpResponseObserver;
+    }
+    ,
+    /**
+     * This will cause problems if the attackRunner has been evaluated before
+     * this is called. However it evaluate is called on (or after) 
+     * DOMContentLoaded which should happen after a response code has been 
+     * received.
+     */
+    gotChannelForAttackRunner: function( nsiHttpChannel, attackRunner){
+        var attackHttpResponseObserver = 
+                this.httpresponseObservers[this.attacks.indexOf(attackRunner)];
+        
+        var observerService = Components.
+                classes['@mozilla.org/observer-service;1'].
+                getService(Components.interfaces.nsIObserverService);
+        var results = checkForServerResponseCode(nsiHttpChannel)
+        dump('resultmanager::gotChannelForAttackRunner results: ' + results + '\n');
+        if (results != null){
+            dump('resultmanager::gotChannelForAttackRunner results: ' + results + '\n');
+            this.addResults(results);
+            observerService.removeObserver(attackHttpResponseObserver, 
+                    AttackHttpResponseObserver_topic);
+            
+            this.httpresponseObservers.
+                    splice(this.attacks.indexOf(attackRunner), 1);
+        }
+        
     }
 };

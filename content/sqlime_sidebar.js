@@ -89,7 +89,6 @@ extension.prototype = {
                 buttonClicked.className + ' and id ' + buttonClicked.id + '\n');
         
         var resultsManager = new ResultsManager();
-        resultsManager.addEvaluator(checkForVulnerableElement);
         resultsManager.addEvaluator(checkForErrorString);
 //         testRunnerContainer = new Array();
         

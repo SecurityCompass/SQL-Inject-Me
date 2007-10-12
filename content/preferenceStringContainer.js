@@ -12,7 +12,7 @@
 function PreferenceStringContainer() {
     this.strings = Array();
     this.prefBranch = null;
-    this.prefService = Components.classes["@mozilla.org/preferences-service;1"].
+    this.prefService = Components.classes['@mozilla.org/preferences-service;1'].
             getService(Components.interfaces.nsIPrefService);
 }
 dump('creating... preferenceStringContainer object\n');

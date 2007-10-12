@@ -26,6 +26,8 @@
             src="chrome://sqlime/content/ErrorStringContainer.js" />
     <script type="application/x-javascript;version=1.7" 
             src="chrome://sqlime/content/AttackRunner.js" />
+    <script type="application/x-javascript" 
+            src="chrome://sqlime/content/AttackHttpResponseObserver.js" />
     <script type="application/x-javascript;version=1.7" 
             src="chrome://sqlime/content/sqlimeevaluators.js" />
     <script type="application/x-javascript;version=1.7" 
