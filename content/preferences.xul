@@ -50,7 +50,7 @@
                     <button label="up" oncommand="preferencesController.moveErrorStringUp()"/>
                     <button label="down" oncommand="preferencesController.moveeErrorStringDown()"/>
                     <button label="add" oncommand="window.openDialog('chrome://sqlime/content/addError.xul', 'attackstring', 'chrome', errorStringContainer, preferencesController, window)"/>
-                    <button label="remove" oncommand="preferencesController.removeAttack()"/>
+                    <button label="remove" oncommand="preferencesController.removeError()"/>
                 </vbox>
             </hbox>
         </groupbox>

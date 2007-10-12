@@ -54,26 +54,33 @@ PreferencesController.prototype = {
         }
     }
     ,
+    removeError: function(){
+        this.removeItem(getErrorStringContainer(), 'existingSQLIerrStrings');    
+    }
+    ,
     removeAttack: function(){
-        var listbox = document.getElementById('existingSQLIstrings');
+        this.removeItem(getAttackStringContainer(), 'existingSQLIstrings');
+    }
+    ,
+    removeItem: function(container, listboxID){
+        var listbox = document.getElementById(listboxID);
         var selectedAttacks = listbox.selectedItems;
-        getAttackStringContainer();
-        var attacks = attackStringContainer.getStrings();
-        for (var i = 0; i < selectedAttacks.length; i++){
-            attacks[selectedAttacks[i].value] = null;
-        }
+        var strings = container.getStrings();
         var n = 0;
-        while (n < attacks.length){
-            if (attacks[n] === null){
-                attacks.splice(n, 1);
+        for (var i = 0; i < selectedAttacks.length; i++){
+            strings[selectedAttacks[i].value] = null;
+        }
+        while (n < strings.length){
+            if (strings[n] === null){
+                strings.splice(n, 1);
             }
             else{
                 n++; //only incrememnt if attacks[n]!==null. Otherwise we'll 
                      // strings which are adjacent.
             }
         }
-        attackStringContainer.save();
-        this.makeUI(attackStringContainer.getStrings());
+        container.save();
+        this.makeUI(container.getStrings(), window, listboxID);
     }
     ,
     exportAttacks: function(){
