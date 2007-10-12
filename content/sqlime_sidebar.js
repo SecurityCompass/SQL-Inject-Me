@@ -90,6 +90,7 @@ extension.prototype = {
         
         var resultsManager = new ResultsManager();
         resultsManager.addEvaluator(checkForVulnerableElement);
+        resultsManager.addEvaluator(checkForErrorString);
 //         testRunnerContainer = new Array();
         
         if (buttonClicked.className && buttonClicked.className === 'run_form_test'){

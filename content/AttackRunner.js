@@ -99,8 +99,7 @@ AttackRunner.prototype = {
         //this should fire only *after* the form has been sumbitted and the new
         //page has loaded.
         function afterWorkTabHasSubmittedAndLoaded(event){
-            resultsManager.evaluate(workTab.linkedBrowser.
-                    contentDocument, self);
+            resultsManager.evaluate(workTab.linkedBrowser, self);
             mainBrowser.removeTab(workTab);
         }
         

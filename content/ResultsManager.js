@@ -16,8 +16,8 @@ function ResultsManager() {
 
 ResultsManager.prototype = {
     
-    evaluate: function(document, attackRunner){
-        var result = null;
+    evaluate: function(browser, attackRunner){
+        
         
         dump('resultmanager::evaluate this.attacks.indexOf(attackRunner) = ' +
                 this.attacks.indexOf(attackRunner) + '\n');
@@ -26,39 +26,39 @@ ResultsManager.prototype = {
             
             for each(var evaluator in this.evaluators){
                 
-                result = evaluator(document);
-                
-                switch(result.type){
-                    
-                    case RESULT_TYPE_ERROR:
-                        if (this.errors[result.value] === undefined)
-                        {
-                            this.errors[result.value] = new Array();
-                        }
-                        this.errors[result.value].push(result);
-                        break;
-                    
-                    case RESULT_TYPE_WARNING:
-                        if (this.warnings[result.value] === undefined)
-                        {
-                            this.warnings[result.value] = new Array();
-                        }
-                        this.warnings[result.value].push(result);
-                        break;
-                    
-                    
-                    case RESULT_TYPE_PASS:
-                        if (this.pass[result.value] === undefined)
-                        {
-                            this.pass[result.value] = new Array();
-                        }
-                        this.pass[result.value].push(result);
-                        break;
+                var results = evaluator(browser);
+                for each (var result in results){
+                    switch(result.type){
                         
-                    default:
-                        dump('resultmanager::evaluate error, result has valid type\n');
-                    
-                    
+                        case RESULT_TYPE_ERROR:
+                            if (this.errors[result.value] === undefined)
+                            {
+                                this.errors[result.value] = new Array();
+                            }
+                            this.errors[result.value].push(result);
+                            break;
+                        
+                        case RESULT_TYPE_WARNING:
+                            if (this.warnings[result.value] === undefined)
+                            {
+                                this.warnings[result.value] = new Array();
+                            }
+                            this.warnings[result.value].push(result);
+                            break;
+                        
+                        
+                        case RESULT_TYPE_PASS:
+                            if (this.pass[result.value] === undefined)
+                            {
+                                this.pass[result.value] = new Array();
+                            }
+                            this.pass[result.value].push(result);
+                            break;
+                            
+                        default:
+                            dump('resultmanager::evaluate error, result has valid type\n');
+                            break;  
+                      }
                 }
                 
             }

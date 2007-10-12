@@ -7,6 +7,8 @@
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
     xmlns:html="http://www.w3.org/1999/xhtml" >
     <script type="application/x-javascript;version=1.7" 
+            src="chrome://global/content/findUtils.js" />
+    <script type="application/x-javascript;version=1.7" 
             src="chrome://sqlime/content/progressListener.js" />
     <script type="application/x-javascript;version=1.7" 
             src="chrome://sqlime/content/tabbrowsermanager.js" />
@@ -20,6 +22,8 @@
             src="chrome://sqlime/content/preferenceStringContainer.js" />
     <script type="application/x-javascript;version=1.7" 
             src="chrome://sqlime/content/attackStringContainer.js" />
+    <script type="application/x-javascript;version=1.7" 
+            src="chrome://sqlime/content/ErrorStringContainer.js" />
     <script type="application/x-javascript;version=1.7" 
             src="chrome://sqlime/content/AttackRunner.js" />
     <script type="application/x-javascript;version=1.7" 
