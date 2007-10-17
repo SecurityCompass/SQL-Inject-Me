@@ -133,9 +133,9 @@ extension.prototype = {
                 }
             }
             else {
-                var testRunner = new TestRunner();
+                var testRunner = new AttackRunner();
                 testRunner.do_test(formPanel, formIndex, null, null, null);
-                testRunnerContainer.push(testRunner);
+//                 testRunnerContainer.push(testRunner);
                 
             }
         }
@@ -164,15 +164,16 @@ extension.prototype = {
                             
                             var testValue = getAttackStringContainer().
                                     getStrings()[testIndex];
-                            var testRunner = new TestRunner();
+                            var testRunner = new AttackRunner();
                             
                             dump('running test on field ' + elementObjet.index 
                                     + ' with value ' + testValue + '\n');
+                            resultsManager.registerAttack(testRunner);
                             
                             testRunner.do_test(formPanel, formIndex, elementObjet, 
                                     testValue, resultsManager);
                                     
-                            testRunnerContainer.push(testRunner);
+//                             testRunnerContainer.push(testRunner);
                         }
                     }
                     
@@ -206,14 +207,16 @@ extension.prototype = {
                             
                             var testValue = getAttackStringContainer().
                                     getStrings()[testIndex];
-                            var testRunner = new TestRunner();
+                            var testRunner = new AttackRunner();
                             
                             dump('running test on field ' + elementObjet.index + ' with value ' + testValue + '\n');
+                            
+                            resultsManager.registerAttack(testRunner);
                             
                             testRunner.do_test(formPanel, formIndex, elementObjet, 
                                     testValue, resultsManager);
                             
-                            testRunnerContainer.push(testRunner);
+//                             testRunnerContainer.push(testRunner);
 
                         }
                     }
