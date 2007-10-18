@@ -1,6 +1,7 @@
 /* prefereneces.js 
- * Requires JSON
- * Requires AttackStringContainer
+ * @requires JSON
+ * @requires AttackStringContainer
+ * @requires util.js
  */
 
 function PreferencesController() {
@@ -93,7 +94,8 @@ PreferencesController.prototype = {
             var xmlAttack = exportDoc.createElement('attack');
             var xmlString = exportDoc.createElement('attackString');
             var xmlSig = exportDoc.createElement('signature');
-            var txtString = exportDoc.createTextNode(attack.string);
+            var txtString = exportDoc.createCDATASection(
+                    encodeXML(attack.string));
             var txtSig = exportDoc.createTextNode(attack.sig);
             xmlString.appendChild(txtString);
             xmlSig.appendChild(txtSig);
@@ -184,18 +186,15 @@ PreferencesController.prototype = {
                     return false;
                 }
                 else{
-                    if (sigTag.childNodes.length === 1 && 
-                        stringTag.childNodes.length === 1 &&
-                        sigTag.firstChild.nodeName === '#text' && 
-                        stringTag.firstChild.nodeName === '#text')
+                    if (stringTag.childNodes.length !== 0)
                     {
                         
                         attackStringContainer.addString(
-                            stringTag.firstChild.nodeValue,
+                            decodeXML(stringTag.textContent),
                             sigTag.firstChild.nodeValue);
                     }
                     else {
-                        alert("Couldn't import attack. attackString or signature tag does not have just one text node. Error while processing the document. ");
+                        alert("Couldn't import attack. attackString is empty. Error while processing the document. ");
                         this.makeUI(attackStringContainer.getStrings(), window); // just in case.
                         return false;
                     }

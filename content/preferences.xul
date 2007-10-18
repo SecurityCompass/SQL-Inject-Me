@@ -15,6 +15,7 @@
         </preferences>
         <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/json.js" />
         <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/io.js" />
+        <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/util.js" />
         <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/preferenceStringContainer.js" />
         <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/ErrorStringContainer.js" />
         <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/attackStringContainer.js" />
