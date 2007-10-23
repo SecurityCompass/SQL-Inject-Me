@@ -59,3 +59,10 @@ li {
 fieldset {
     margin-bottom: 1em;
 }
+
+ul {
+    margin: 0;
+}
+li {
+    margin-top: .5em;
+}

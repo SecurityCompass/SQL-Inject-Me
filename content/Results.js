@@ -17,6 +17,7 @@ function Result(type, value, message){
     this.value = value;
     this.type = type;
     this.message = message;
+    this.testData = null;
     dump('Result::Ctor (' + type+ ' ' + value+ ' ' + message + '\n');
 }
 

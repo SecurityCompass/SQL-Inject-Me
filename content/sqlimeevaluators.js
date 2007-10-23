@@ -50,7 +50,7 @@ function checkForServerResponseCode(nsiHttpChannel){
                 result = new Result(RESULT_TYPE_PASS, 100, "Server returned OK return code ('" + responseCode + "')");
             }
             else {
-                result = new Result(RESULT_TYPE_ERROR, 100, "server returned a bad responseCode (" + responseCode + ", " + nsiHttpChannel.responseStatusText + ")\n" );
+                result = new Result(RESULT_TYPE_ERROR, 100, "server returned a bad response code :" + responseCode + ", " + nsiHttpChannel.responseStatusText + "\n" );
             }
         }
         return [result];

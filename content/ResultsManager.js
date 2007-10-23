@@ -64,6 +64,12 @@ ResultsManager.prototype = {
             for each(var evaluator in this.evaluators){
                 
                 var results = evaluator(browser);
+//                 /*alert*/('# results: ' + results.length);
+                dump('resultsManager::evaluate attackRunner::testData'+attackRunner.testData.length+'\n');
+                for each(var result in results){
+                    result.testData = attackRunner.testData;
+//                     alert('ar:td:' + attackRunner.testData);
+                }
                 this.addResults(results);
                 
             }
@@ -197,7 +203,23 @@ ResultsManager.prototype = {
                     results += "<fieldset>";
                     results += "<p>Result: <span class=\"failed\">Failed</span></p>";
                     results += "<p>Details: " + error.message + "</p>";
-                    results += "</fieldset>";
+                    results += "\nForm Data (bold field has test data):";
+                    results += "<ul>";
+                    
+                    for each (var fieldInfo in error.testData){
+                        results += '<li>';
+                        if (fieldInfo.tested){
+                            results+= '<strong>';
+                        }
+                        results += fieldInfo.name + ': ' + 
+                                encodeString(fieldInfo.data);
+                        if (fieldInfo.tested){
+                            results+= '</strong>';
+                        }
+                        results += '</li>';
+                    }
+                    results += '</ul>';
+                    results += '</fieldset>';
                     
                 }
             }

@@ -15,6 +15,8 @@ function AttackRunner(){
 }
 
 AttackRunner.prototype = {
+    testData: null
+    ,
     submitForm: function(tab, formIndex){
         dump('going to submit form in tab: ' + tab.nodeName + '\n');
         dump('the forms are: ' + tab.linkedBrowser.contentDocument.forms + 
@@ -74,13 +76,19 @@ AttackRunner.prototype = {
             dump('start afterWorkTabHasLoaded\n');
             
             //this will copy all the form data...
-            if (field)
+            if (field){
                 tabManager.writeTabForms(workTab.linkedBrowser.contentDocument.
                         forms,  formIndex, field.index, testValue);
-            else 
+                
+            }
+            else {
                 tabManager.writeTabForms(workTab.linkedBrowser.contentDocument.
                         forms,  formIndex, null, null);
-            
+                
+            }
+            self.testData = tabManager.getTabData(workTab.linkedBrowser.
+                    contentDocument.forms,  formIndex, field.index);
+            dump('attackRunner::testData == ' + this.testData + '\n');
             dump('tab data should be written now\n');
             
             workTab.linkedBrowser.removeEventListener('pageshow', 

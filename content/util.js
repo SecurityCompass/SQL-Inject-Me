@@ -34,3 +34,15 @@ function encodeXML(xmlString) {
     return xmlString.replace(regex, replaced, 'gm');
     
 }
+
+/**
+ * Takes a string and returns the string with each character encoded in html
+ * entities (e.g. &#65; for A).
+ */
+function encodeString(str){
+    var rv = "";
+    for each(var letter in str){
+        rv += '&#' + letter.charCodeAt() +  ';';
+    }
+    return rv;
+}

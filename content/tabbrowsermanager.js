@@ -125,6 +125,25 @@ TabManager.prototype = {
         }
     }
     ,
+    getTabData: function(forms, testFormIndex, testFieldIndex){
+        dump('writeTabForms::forms ' + forms[0] + '\n');
+        var rv = new Array();
+        var formIndex = testFormIndex;
+    
+        for (var elementIndex = 0; 
+        elementIndex < forms[formIndex].elements.length; 
+        elementIndex++)
+        {
+            var element = forms[formIndex].elements[elementIndex];
+            var fieldInfo = new Object();
+            fieldInfo.name = element.name;
+            fieldInfo.data = element.value;
+            fieldInfo.tested = (elementIndex == testFieldIndex);
+            rv.push(fieldInfo);
+        }
+        return rv;
+    }
+    ,
     writeTabData: function(tab){
         this.writeTabHistory(tab.linkedBrowser.webNavigation);
         dump('writting tab data... tab.linkedBrowser.webNavigation  == ' + tab.linkedBrowser.webNavigation + '\n');
