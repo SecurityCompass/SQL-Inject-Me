@@ -21,3 +21,41 @@ p {
 .title {
     color: #405068 !important;
 }
+
+.bar-status{
+    text-align: left;
+    width: 6 em;
+}
+.bar {
+    width: 99%;
+    border: thin solid
+}
+.percent {
+    text-align: left;
+    width: 6em;
+}
+.bar-passed {
+
+}
+.bar-warning{
+}
+.bar-failed{
+}
+li {
+    list-style: none;
+}
+.passed {
+    color: green;
+}
+.warning {
+    color: #AAAA00;
+}
+.failed {
+    color: red;
+}
+.title {
+    color: #405068 !important;
+}
+fieldset {
+    margin-bottom: 1em;
+}
