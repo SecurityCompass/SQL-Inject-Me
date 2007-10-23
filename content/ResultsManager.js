@@ -232,6 +232,21 @@ ResultsManager.prototype = {
                     results += '<fieldset>';
                     results += "<p>Result: <span class=\"warning\">Warning</span></p>";
                     results += "<p>Details: " + warning.message + "</p>";
+                    results += "<ul>";
+                    
+                    for each (var fieldInfo in error.testData){
+                        results += '<li>';
+                        if (fieldInfo.tested){
+                            results+= '<strong>';
+                        }
+                        results += fieldInfo.name + ': ' + 
+                                encodeString(fieldInfo.data);
+                        if (fieldInfo.tested){
+                            results+= '</strong>';
+                        }
+                        results += '</li>';
+                    }
+                    results += '</ul>';
                     results += '</fieldset>\n';
                 }
             }
@@ -244,6 +259,21 @@ ResultsManager.prototype = {
                     results += '<fieldset>';
                     results += "<p>Result: <span class=\"Passed\">Passed</span></p>";
                     results += "<p>Details: " + pass.message + "</p>";
+                    results += "<ul>";
+                    
+                    for each (var fieldInfo in error.testData){
+                        results += '<li>';
+                        if (fieldInfo.tested){
+                            results+= '<strong>';
+                        }
+                        results += fieldInfo.name + ': ' + 
+                                encodeString(fieldInfo.data);
+                        if (fieldInfo.tested){
+                            results+= '</strong>';
+                        }
+                        results += '</li>';
+                    }
+                    results += '</ul>';
                     results += '</fieldset>\n';
                 }
                 

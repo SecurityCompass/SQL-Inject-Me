@@ -32,7 +32,7 @@
                 </listbox>
                 <vbox>
                     <button label="up" oncommand="preferencesController.moveAttackStringUp()"/>
-                    <button label="down" oncommand="preferencesController.moveItemDown()"/>
+                    <button label="down" oncommand="preferencesController.moveAttackStringDown()"/>
                     <button label="add" oncommand="window.openDialog('chrome://sqlime/content/addAttack.xul', 'attackstring', 'chrome', attackStringContainer, preferencesController, window)"/>
                     <button label="remove" oncommand="preferencesController.removeAttack()"/>
                 </vbox>
@@ -49,7 +49,7 @@
                 </listbox>
                 <vbox>
                     <button label="up" oncommand="preferencesController.moveErrorStringUp()"/>
-                    <button label="down" oncommand="preferencesController.moveeErrorStringDown()"/>
+                    <button label="down" oncommand="preferencesController.moveErrorStringDown()"/>
                     <button label="add" oncommand="window.openDialog('chrome://sqlime/content/addError.xul', 'attackstring', 'chrome', errorStringContainer, preferencesController, window)"/>
                     <button label="remove" oncommand="preferencesController.removeError()"/>
                 </vbox>

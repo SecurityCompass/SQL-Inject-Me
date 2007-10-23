@@ -205,7 +205,8 @@ PreferencesController.prototype = {
             alert("Couldn't find any attacks. No Attacks imported.");
             return false;            
         }
-        this.makeUI(attackStringContainer.getStrings(), window);
+        this.makeUI(getAttackStringContainer().getStrings(), window, 'existingSQLIstrings');
+        this.makeUI(getErrorStringContainer().getStrings(), window, 'existingSQLIerrStrings');
         return true;
     }
     ,
