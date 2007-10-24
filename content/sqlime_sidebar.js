@@ -275,7 +275,7 @@ extension.prototype = {
         
                         
         var assignSidebarValueToFormElement = function(event){
-            formElement.value=sidebarElement.value;
+            formElement.value=sidebarElement.value.toString();
         }
                         
         var assignFormElementValueToSideBar =  function(event){
@@ -288,8 +288,11 @@ extension.prototype = {
                 assignFormElementValueToSideBar, true);
         formElement.addEventListener('change', 
                 assignFormElementValueToSideBar, true);
-        sidebarElement.addEventListener('keypress', 
+        sidebarElement.addEventListener('input', 
                 assignSidebarValueToFormElement, true);
+        sidebarElement.addEventListener('click', 
+                assignSidebarValueToFormElement, true);
+                
                            
     }
     ,
@@ -354,7 +357,7 @@ extension.prototype = {
                 
                 dump('aForm.elements.length: ' + aForm.elements.length +'\n');
                 
-                //iterat through the forms and generate the DOM.
+                //iterate through the forms and generate the DOM.
                 if (aForm.elements.length !== 0){
                     for (var n = 0; n < aForm.elements.length; n++){
                         var sidebarElement = null;
