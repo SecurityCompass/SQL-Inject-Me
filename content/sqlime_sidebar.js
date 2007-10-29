@@ -566,7 +566,9 @@ function createFieldUI(node){
     var attacks = attackStringContainer.getStrings();
     for (var i = 0; i < attacks.length; i++){
         var aMenuItem = document.createElement("menuitem");
-        aMenuItem.setAttribute("label", attacks[i].string);
+        aMenuItem.setAttribute('label', attacks[i].string);
+        aMenuItem.setAttribute('width', '15 em');
+        aMenuItem.setAttribute('crop', 'end');
         menupopup.appendChild(aMenuItem);
         dump("menupopup childnodes length: " + menupopup.childNodes.length+"\n");
     }
