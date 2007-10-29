@@ -68,12 +68,12 @@ extension.prototype = {
         
     }
     ,
-    getFieldsToTest:function(formPanel) {
+    getFieldsToTest:function(formPanel, all) {
         var fieldUIs = formPanel.getElementsByAttribute('class', 'nolabel');
         var fieldsToTest = new Array();
         
         for(var i =0; i < fieldUIs.length; i++){
-            if (fieldUIs[i].checked){
+            if (fieldUIs[i].checked || all === true){
                 var fieldToTest = new Object();
                 fieldToTest.index = i;
                 fieldsToTest.push(fieldToTest);
@@ -90,7 +90,9 @@ extension.prototype = {
         
         var resultsManager = new ResultsManager();
         resultsManager.addEvaluator(checkForErrorString);
-//         testRunnerContainer = new Array();
+
+        var testRunnerContainer = getTestRunnerContainer(getMainWindow().
+                document.getElementById('content').mTabs.length);
         
         if (buttonClicked.className && buttonClicked.className === 'run_form_test'){
             var testType = this.getTestType();
@@ -123,20 +125,14 @@ extension.prototype = {
                             
                             resultsManager.registerAttack(testRunner);
                             
-                            testRunner.do_test(formPanel, formIndex, field, 
-                                    testValue, resultsManager);
-                            
-//                             testRunnerContainer.push(testRunner);
+                            getTestRunnerContainer().addTestRunner(testRunner,
+                                    formPanel, formIndex, field, testValue, 
+                                    resultsManager);
                             
                         }
                     }
+                    resultsManager.showResults();
                 }
-            }
-            else {
-                var testRunner = new AttackRunner();
-                testRunner.do_test(formPanel, formIndex, null, null, null);
-//                 testRunnerContainer.push(testRunner);
-                
             }
         }
         else if (buttonClicked.id === 'test_all_forms_with_all_attacks') {
@@ -149,14 +145,12 @@ extension.prototype = {
                 for (var formIndex = 0; formIndex < numberOfForms; formIndex++){
                     tabbox.selectedIndex = formIndex;
                                         
-                    dump('going to test ' + numberOfTests + '\n');
+                    dump('test_all_forms_with_all_attacks: going to test ' + numberOfTests + '\n');
+                    var fieldsToTest = this.getFieldsToTest(tabbox.selectedPanel, true);
                     
-                    for (var elementIndex = 0; 
-                        elementIndex < htmlDoc.forms[formIndex].elements.length; 
-                        elementIndex++)
+                    for each(var field in fieldsToTest)
                     {
-                        var elementObjet = new Object();
-                        elementObjet.index = elementIndex;
+                        
                         for (var testIndex = 0; 
                             testIndex < numberOfTests; 
                             testIndex++)
@@ -166,18 +160,21 @@ extension.prototype = {
                                     getStrings()[testIndex];
                             var testRunner = new AttackRunner();
                             
-                            dump('running test on field ' + elementObjet.index 
+                            dump('running test on field ' + field.index 
                                     + ' with value ' + testValue + '\n');
+                            
                             resultsManager.registerAttack(testRunner);
                             
-                            testRunner.do_test(formPanel, formIndex, elementObjet, 
-                                    testValue, resultsManager);
-                                    
-//                             testRunnerContainer.push(testRunner);
+                            getTestRunnerContainer().addTestRunner(testRunner,
+                                    tabbox.selectedPanel, formIndex, field, testValue, 
+                                    resultsManager);
+                            
                         }
                     }
                     
                 }
+                
+                resultsManager.showResults();
                 
         }
         else if (buttonClicked.id === 'test_all_forms_with_top_attacks') {
@@ -190,16 +187,15 @@ extension.prototype = {
                     tabbox.selectedIndex = formIndex;
 //                     var fieldsToTest = this.getFieldsToTest(tabbox.selectedPanel);
                     
-                    dump('going to test ' + numberOfTests + '\n');
+                    dump('test_all_forms_with_top_attacks: going to test ' + numberOfTests + '\n');
 //                     dump('fields of ' + typeof(fieldsToTest)+ '\'\n');
-                    
-//                     for each (var field in fieldsToTest) {
-                    for (var elementIndex = 0; 
-                    elementIndex < htmlDoc.forms[formIndex].elements.length; 
-                    elementIndex++)
-                    {
-                        var elementObjet = new Object();
-                        elementObjet.index = elementIndex;
+                    dump('test_all_forms_with_top_attacks: htmlDoc.forms[formIndex].elements.length = ' + htmlDoc.forms[formIndex].elements.length + '\n');
+                    var fieldsToTest = this.getFieldsToTest(
+                            tabbox.selectedPanel, true);
+                    for each (var field in fieldsToTest) {
+                        
+                        dump('test_all_forms_with_top_attacks: numberOfTests == ' + numberOfTests + '\n');
+                        
                         for (var testIndex = 0; 
                         testIndex < numberOfTests; 
                         testIndex++)
@@ -209,19 +205,21 @@ extension.prototype = {
                                     getStrings()[testIndex];
                             var testRunner = new AttackRunner();
                             
-                            dump('running test on field ' + elementObjet.index + ' with value ' + testValue + '\n');
+                            dump('running test on field ' + field.index + ' with value ' + testValue + '\n');
                             
                             resultsManager.registerAttack(testRunner);
                             
-                            testRunner.do_test(formPanel, formIndex, elementObjet, 
-                                    testValue, resultsManager);
-                            
-//                             testRunnerContainer.push(testRunner);
+                            getTestRunnerContainer().addTestRunner(testRunner,
+                                    formPanel, formIndex, field, testValue, 
+                                    resultsManager);
 
                         }
                     }
                     
                 }
+                
+                resultsManager.showResults();
+
         }
         dump('do we have results?' + resultsManager.hasResults()+'\n');
 //         if (resultsManager.hasResults()){
@@ -246,12 +244,11 @@ extension.prototype = {
         runTopTests_mi.setAttribute('label', "Run top " + this.
                 getPreferredNumberOfAttacks() + " tests");
         runTopTests_mi.setAttribute('value', TestType_PrefNumTestsForForm);
-        submitThisForm_mi.setAttribute('label', "Submit this form once");
+        
         submitThisForm_mi.setAttribute('value', TestType_OneTestForForm);
         
         rv.menuitems.push(runTests_mi);
         rv.menuitems.push(runTopTests_mi);
-        rv.menuitems.push(submitThisForm_mi);
      
          //menulist.setAttribute("editable", false);
         rv.menupopup= menupopup;

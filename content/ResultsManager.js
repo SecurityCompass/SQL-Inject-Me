@@ -72,13 +72,7 @@ ResultsManager.prototype = {
                 }
                 this.addResults(results);
                 
-            }
-            
-            this.attacks.splice(this.attacks.indexOf(attackRunner), 1);
-            
-            if (this.attacks.length === 0){
-                
-                this.showResults();
+                this.attacks.splice(this.attacks.indexOf(attackRunner), 1);
                 
             }
             
@@ -160,26 +154,31 @@ ResultsManager.prototype = {
         rv += '<td class="bar"><div style="width: ' +
                 Math.round((numFailed / numTestsRun)*100).toString() +
                 '% ; background-color: #FF3333;color: white;border: solid #FF3333;">&nbsp;</div></td>'+
-                '<td class="percent">'+Math.round((numFailed / numTestsRun)*100).toString()+'%</td>';
+                '<td class="percent">'+numFailed+'</td>';
         rv += '</tr><tr>';
         rv +="<td class=\"bar-status\">Warning:</style>" +
                 '</td>';
         rv += '<td class="bar"><div style="width: ' +
                 Math.round((numWarned / numTestsRun)*100).toString() + 
                 '%; background-color: #FFFF00; color: white;border: solid #FFFF00;">&nbsp;</div></td>' +
-                '<td class="percent">'+Math.round((numWarned / numTestsRun)*100).toString()+'%</td>';
+                '<td class="percent">'+numWarned+'</td>';
         rv += '</tr><tr>';
         rv += "<td class=\"bar-status\">Passed:</style>" +
                 '<td class="bar"><div style="width: ' +
                 Math.round((numPassed / numTestsRun)*100).toString() + 
                 '%; background-color: #66ff66;color: white;border: solid #66ff66;">&nbsp;</div></td>'+
-                '<td class="percent">'+Math.round((numPassed / numTestsRun)*100).toString()+'%</td>';
+                '<td class="percent">'+numPassed+'</td>';
         rv +='</tr></table>';
         
         return rv;
     }
     ,
     showResults: function(){
+        if (this.attacks.length != 0){
+            var self = this;
+            setTimeout(function(){self.showResults()}, 1000);
+            return;
+        }
         var resultsTab = null;
         var numTestsRun = this.getNumTestsRun();
         var numPasses = this.getNumTestsPassed();
@@ -192,7 +191,7 @@ ResultsManager.prototype = {
         results += "<h1>Test Results</h1>";
         
         results += this.makeResultsGraph(numTestsRun, numFailes, numWarnings, 
-        numPasses);
+                numPasses);
         
         results += "<h2>Results</h2>";
         
@@ -232,9 +231,8 @@ ResultsManager.prototype = {
                     results += '<fieldset>';
                     results += "<p>Result: <span class=\"warning\">Warning</span></p>";
                     results += "<p>Details: " + warning.message + "</p>";
-                    results += "<ul>";
-                    
-                    for each (var fieldInfo in error.testData){
+                    results += '<ul>';
+                    for each (var fieldInfo in warning.testData){
                         results += '<li>';
                         if (fieldInfo.tested){
                             results+= '<strong>';
@@ -259,9 +257,8 @@ ResultsManager.prototype = {
                     results += '<fieldset>';
                     results += "<p>Result: <span class=\"Passed\">Passed</span></p>";
                     results += "<p>Details: " + pass.message + "</p>";
-                    results += "<ul>";
-                    
-                    for each (var fieldInfo in error.testData){
+                    results += '<ul>';
+                    for each (var fieldInfo in pass.testData){
                         results += '<li>';
                         if (fieldInfo.tested){
                             results+= '<strong>';
