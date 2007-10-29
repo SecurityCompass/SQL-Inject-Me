@@ -28,7 +28,7 @@
             <caption label="SQL Injection Strings" />
             <label style="visibility:hidden;color: red" value="No attacks, please enter some" id="noattackslbl" />
             <hbox>
-                <listbox id="existingSQLIstrings" rows="10" seltype="multiple">
+                <listbox id="existingSQLIstrings" rows="10" seltype="multiple" flex="1">
                 </listbox>
                 <vbox>
                     <button label="up" oncommand="preferencesController.moveAttackStringUp()"/>
@@ -45,7 +45,7 @@
             </description>
             <label style="visibility:hidden;color: red" value="No error strings, please enter some" id="noerrorslbl" />
             <hbox>
-                <listbox id="existingSQLIerrStrings" rows="10" seltype="multiple">
+                <listbox id="existingSQLIerrStrings" rows="10" seltype="multiple" flex="1">
                 </listbox>
                 <vbox>
                     <button label="up" oncommand="preferencesController.moveErrorStringUp()"/>
