@@ -14,7 +14,7 @@ function checkForErrorString(browser) {
     dump('sqlimeevaluators::checkForErrorString browswer._fastFind == ' +browser._fastFind + '\n');
     for each (var error in errorContainer.getStrings()){
         var result;
-        dump('sqlimeevaluators::checkForErrorString going to check ' + browser.spec + ' with value \'' + browser.webNavigation.document.body.innerHTML + '\' for \'' + error.string + '\'\n');
+//        dump('sqlimeevaluators::checkForErrorString going to check ' + browser.spec + ' with value \'' + browser.webNavigation.document.body.innerHTML + '\' for \'' + error.string + '\'\n');
         try {
             browser.fastFind.init(browser.docShell);
             dump('sqlimeevaluators::checkForErrorString browser.fastFind.find(error.string, false) == ' + browser.fastFind.find(error.string, false) + '\n');

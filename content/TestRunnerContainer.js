@@ -72,8 +72,7 @@ function getTestRunnerContainer(currentNumTabs){
         xssme__testrunnercontainer__ = new TestRunnerContainer(currentNumTabs);
         xssme__testrunnercontainer__.start();
     }
-    
-    if (currentNumTabs) {
+    else if (currentNumTabs) {
         xssme__testrunnercontainer__.baseNumTabs = currentNumTabs;
         xssme__testrunnercontainer__.testRunners.splice(0, 
                 xssme__testrunnercontainer__.testRunners.length);

@@ -99,16 +99,17 @@ AttackRunner.prototype = {
                 workTab.linkedBrowser.addEventListener('pageshow', 
                         afterWorkTabHasSubmittedAndLoaded, false); 
                            
-                var observerService = Components.
-                        classes['@mozilla.org/observer-service;1'].
-                        getService(Components.interfaces.nsIObserverService);
+                //var observerService = Components.
+                //        classes['@mozilla.org/observer-service;1'].
+                //        getService(Components.interfaces.nsIObserverService);
+                //
+                //var attackHttpResponseObserver = 
+                //        new AttackHttpResponseObserver(self, resultsManager);
+                //
+                //resultsManager.addObserver(self, attackHttpResponseObserver);
+                //observerService.addObserver(attackHttpResponseObserver, 
+                //        'http-on-examine-response', false);
                 
-                var attackHttpResponseObserver = 
-                        new AttackHttpResponseObserver(self, resultsManager);
-                
-                resultsManager.addObserver(self, attackHttpResponseObserver);
-                observerService.addObserver(attackHttpResponseObserver, 
-                        'http-on-examine-response', false);
             }
             var formGotSubmitted = self.submitForm(
                     workTab, formIndex);

@@ -131,8 +131,8 @@ TabManager.prototype = {
         var formIndex = testFormIndex;
     
         for (var elementIndex = 0; 
-        elementIndex < forms[formIndex].elements.length; 
-        elementIndex++)
+            elementIndex < forms[formIndex].elements.length; 
+            elementIndex++)
         {
             var element = forms[formIndex].elements[elementIndex];
             var fieldInfo = new Object();

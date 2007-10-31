@@ -174,7 +174,9 @@ ResultsManager.prototype = {
     }
     ,
     showResults: function(){
-        if (this.attacks.length != 0){
+        if (this.attacks.length != 0 ||
+            this.httpresponseObservers.length != 0)
+        {
             var self = this;
             setTimeout(function(){self.showResults()}, 1000);
             return;
@@ -316,29 +318,25 @@ ResultsManager.prototype = {
     }
     ,
     /**
-     * This will cause problems if the attackRunner has been evaluated before
-     * this is called. However it evaluate is called on (or after) 
-     * DOMContentLoaded which should happen after a response code has been 
-     * received.
+     * This evaluates an httpChannel for an attack. 
      */
-    gotChannelForAttackRunner: function( nsiHttpChannel, attackRunner){
-        var attackHttpResponseObserver = 
-                this.httpresponseObservers[this.attacks.indexOf(attackRunner)];
+    gotChannelForAttackRunner: function( nsiHttpChannel, httpResponseObserver){
         
         var observerService = Components.
                 classes['@mozilla.org/observer-service;1'].
                 getService(Components.interfaces.nsIObserverService);
         var results = checkForServerResponseCode(nsiHttpChannel)
         dump('resultmanager::gotChannelForAttackRunner results: ' + results + '\n');
-        if (results != null){
+        if (results != null) {
             dump('resultmanager::gotChannelForAttackRunner results: ' + results + '\n');
             this.addResults(results);
-            observerService.removeObserver(attackHttpResponseObserver, 
+            observerService.removeObserver(httpResponseObserver, 
                     AttackHttpResponseObserver_topic);
+            this.httpresponseObservers.splice(this.httpresponseObservers.
+                indexOf(httpResponseObserver), 1);
             
-            this.httpresponseObservers.
-                    splice(this.attacks.indexOf(attackRunner), 1);
         }
+        
         
     }
 };

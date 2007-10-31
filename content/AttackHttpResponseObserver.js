@@ -28,7 +28,7 @@ AttackHttpResponseObserver.prototype = {
             try {
                 this.resultsManager.gotChannelForAttackRunner(subject.
                         QueryInterface(Components.interfaces.nsIHttpChannel),
-                        this.attackRunner);
+                        this);
             }
             catch(err) {
                 dump('AttackHttpResponseObserver::observe: ' + err + '\n');
