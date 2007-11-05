@@ -314,11 +314,7 @@ ResultsManager.prototype = {
     ,
     addObserver: function(attackRunner, attackHttpResponseObserver){
         
-        /*
-         * This will cause problems if the attackRunner 
-         */
-        this.httpresponseObservers[this.attacks.indexOf(attackRunner)] = 
-                attackHttpResponseObserver;
+        this.httpresponseObservers.push(attackHttpResponseObserver);
     }
     ,
     /**

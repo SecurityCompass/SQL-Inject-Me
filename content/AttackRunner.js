@@ -107,7 +107,7 @@ AttackRunner.prototype = {
                 var attackHttpResponseObserver = 
                         new AttackHttpResponseObserver(self, resultsManager);
 
-                resultsManager.addObserver(self, attackHttpResponseObserver);
+                resultsManager.addObserver(attackHttpResponseObserver);
                 observerService.addObserver(attackHttpResponseObserver, 
                         'http-on-examine-response', false);
                 
