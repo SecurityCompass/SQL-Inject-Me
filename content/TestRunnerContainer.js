@@ -55,10 +55,14 @@ TestRunnerContainer.prototype = {
         function doAgain(){
             self.start();
         }
-        setTimeout(doAgain, 1);
+        if (this.keepChecking) {
+            setTimeout(doAgain, 1);
+        }
     }
     ,
     numWorkTabs: 6
+    ,
+    keepChecking: true
 };
 
 /**

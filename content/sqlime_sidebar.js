@@ -94,6 +94,10 @@ extension.prototype = {
         var testRunnerContainer = getTestRunnerContainer(getMainWindow().
                 document.getElementById('content').mTabs.length);
         
+        if (testRunnerContainer.keepChecking === false) {
+            testRunnerContainer.keepChecking = true;
+        }
+        
         if (buttonClicked.className && buttonClicked.className === 'run_form_test'){
             var testType = this.getTestType();
             var formPanel = document.getElementById('sidebarformtabbox').

@@ -181,11 +181,15 @@ ResultsManager.prototype = {
             setTimeout(function(){self.showResults()}, 1000);
             return;
         }
+        
+        getTestRunnerContainer().keepChecking = false;
+        
         var resultsTab = null;
         var numTestsRun = this.getNumTestsRun();
         var numPasses = this.getNumTestsPassed();
         var numWarnings = this.getNumTestsWarned();
         var numFailes = this.getNumTestsFailed();
+        
         var results="<html><head><link  rel=\"stylesheet\" type=\"text/css\""+
                 "href=\"chrome://sqlime/skin/results.css\"/>"+
                 "<title>Results</title></head><body>";
