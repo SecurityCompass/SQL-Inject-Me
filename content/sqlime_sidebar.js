@@ -96,6 +96,7 @@ extension.prototype = {
         
         if (testRunnerContainer.keepChecking === false) {
             testRunnerContainer.keepChecking = true;
+            testRunnerContainer.start();
         }
         
         if (buttonClicked.className && buttonClicked.className === 'run_form_test'){
