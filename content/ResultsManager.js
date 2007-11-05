@@ -150,25 +150,25 @@ ResultsManager.prototype = {
         var rv = '';
         rv += '<table style="width: 100%">' +
                 '<tr>';
-        rv += "<td class=\"bar-status\">Failed:</style>";
+        rv += "<td class=\"bar-status\">Failed:</td>";
         rv += '<td class="bar"><div style="width: ' +
                 Math.round((numFailed / numTestsRun)*100).toString() +
-                '% ; background-color: #FF3333;color: white;border: solid #FF3333;">&nbsp;</div></td>'+
+                '% ; background-color: #FF3333;border: none;">&nbsp;</div></td>'+
                 '<td class="percent">'+numFailed+'</td>';
         rv += '</tr><tr>';
-        rv +="<td class=\"bar-status\">Warning:</style>" +
+        rv +="<td class=\"bar-status\">Warning:</td>" +
                 '</td>';
         rv += '<td class="bar"><div style="width: ' +
                 Math.round((numWarned / numTestsRun)*100).toString() + 
-                '%; background-color: #FFFF00; color: white;border: solid #FFFF00;">&nbsp;</div></td>' +
+                '%; background-color: #FFFF00;border: none;">&nbsp;</div></td>' +
                 '<td class="percent">'+numWarned+'</td>';
         rv += '</tr><tr>';
-        rv += "<td class=\"bar-status\">Passed:</style>" +
+        rv += "<td class=\"bar-status\">Passed:</td>" +
                 '<td class="bar"><div style="width: ' +
                 Math.round((numPassed / numTestsRun)*100).toString() + 
-                '%; background-color: #66ff66;color: white;border: solid #66ff66;">&nbsp;</div></td>'+
+                '%; background-color: #66ff66;border: none;">&nbsp;</div></td>'+
                 '<td class="percent">'+numPassed+'</td>';
-        rv +='</tr></table>';
+        rv +='</tr></table>\n';
         
         return rv;
     }
