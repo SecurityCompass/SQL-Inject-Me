@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+
+<?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
+
+<dialog id="errorstring" title="Error String"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        buttons="accept,cancel"
+        buttonlabelaccept="Set Error String"
+        buttonlabelcancel="Cancel"
+        ondialogaccept="return checkOK();"
+        ondialogcancel="return checkCancel();">
+<script type="application/x-javascript" src="chrome://sqlime/content/json.js" />
+<script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/preferenceStringContainer.js" />
+<script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/ErrorStringContainer.js" />
+<script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/preferences.js" />
+<script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/addError.js" />
+<description value="Please enter an error string" />
+<label value="Error String" control="errorstringtxtbox" />
+<textbox id="errorstringtxtbox" />
+<script>
+    function checkOK(){
+        return onOk();
+    }
+    function checkCancel(){
+        return onCancel();
+    }
+</script>
+</dialog>

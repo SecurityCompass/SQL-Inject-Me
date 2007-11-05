@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet href="chrome://sqlime/skin/overlay.css" type="text/css" ?>
+<!DOCTYPE overlay SYSTEM "chrome://sqlime/locale/overlay.dtd">
+<overlay id="sqlime-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/json.js" />
+    <menupopup id="menu_ToolsPopup">
+        <menu id="sqlime-tools" label="SQL Inject ME"  insertafter="devToolsSeparator" accesskey="x">
+            <menupopup>
+                <menuitem 
+                        label="Open SQL Inject Me Sidebar" 
+                        observes="openSQLIMeSidebar" 
+                />
+                <menuitem 
+                          label="&sqlime.options;" 
+                          oncommand="window.openDialog('chrome://sqlime/content/preferences.xul')" 
+                />
+                <menuitem label="&sqlime.about;" oncommand="window.openDialog('chrome://sqlime/content/about.xul');" />
+                <menuitem label="&sqlime.help;" oncommand="window.open('http://www.securitycompass.com', 'helpwindow', '');" />  
+                <menuseparator />
+                <menuitem label="Test Reulsts Page (to be removed, for demo only)" 
+                          oncommand="var tab = getBrowser().addTab('chrome://sqlime/content/results.html'); gBrowser.selectedTab = tab;" />
+            </menupopup>
+        </menu>
+    </menupopup>
+    <broadcasterset id="mainBroadcasterSet">
+        <broadcaster id="openSQLIMeSidebar"
+                     label="Open SQL Inject Me Sidebar"
+                     autoCheck="false"
+                     group="sidebar"
+                     sidebarurl="chrome://sqlime/content/sqlime_sidebar.xul"
+                     sidebartitle="SQL Inject Me"
+                     oncommand="toggleSidebar('openSQLIMeSidebar');" />
+    </broadcasterset>
+    
+    <popup id="contentAreaContextMenu">
+        
+        <menuitem label="Open SQL Inject Me Sidebar" observes="openSQLIMeSidebar" insertbefore="context-viewbgimage" />
+        
+    </popup>
+</overlay>

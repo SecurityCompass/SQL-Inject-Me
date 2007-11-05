@@ -1,0 +1,17 @@
+#form1_field1_menulist.activated .menulist-editable-input,
+#form1_field2_menulist.activated .menulist-editable-input,
+.activated .menulist-editable-input
+{
+    background-color: #FFFF11 !important;
+}
+
+#form1_field1_checkbox .checkbox-label-box,
+#form1_field2_checkbox .checkbox-label-box,
+.nolabel .checkbox-label-box
+{
+    display: none;
+}
+
+.title {
+    color: #405068 !important;
+}
