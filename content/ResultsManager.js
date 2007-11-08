@@ -7,13 +7,16 @@
 /**
  * The Results Manager is 
  */
-function ResultsManager() {
+function ResultsManager(extensionManager) {
     this.evaluators = new Array();
     this.errors = new Array();
     this.warnings = new Array();
     this.pass = new Array();
     this.attacks = new Array();
     this.httpresponseObservers = new Array(); //parallel to this.attacks
+    this.sourceListeners = new Array(); //members are asynchronous.
+    this.sourceEvaluators = new Array();
+    this.extensionManager = extensionManager;
 }
 
 ResultsManager.prototype = {
@@ -55,29 +58,28 @@ ResultsManager.prototype = {
     ,
     evaluate: function(browser, attackRunner){
         
-        
-        dump('resultmanager::evaluate this.attacks.indexOf(attackRunner) = ' +
-                this.attacks.indexOf(attackRunner) + '\n');
-        
-        if (this.attacks.indexOf(attackRunner) !== -1){
-            
-            for each(var evaluator in this.evaluators){
+            if (this.attacks.indexOf(attackRunner) !== -1){
+                for each (var evaluator in this.evaluators){
+                    
+                    var results = evaluator(browser);
+    //                 /*alert*/('# results: ' + results.length);
+                    dump('resultsManager::evaluate attackRunner::testData'+attackRunner.testData.length+'\n');
+                    for each(var result in results){
+                        result.testData = attackRunner.testData;
+    //                     alert('ar:td:' + attackRunner.testData);
+                    }
+                    this.addResults(results);
+                    
                 
-                var results = evaluator(browser);
-//                 /*alert*/('# results: ' + results.length);
-                dump('resultsManager::evaluate attackRunner::testData'+attackRunner.testData.length+'\n');
-                for each(var result in results){
-                    result.testData = attackRunner.testData;
-//                     alert('ar:td:' + attackRunner.testData);
                 }
-                this.addResults(results);
                 
                 this.attacks.splice(this.attacks.indexOf(attackRunner), 1);
                 
+                
             }
             
-        }
-        
+//             if (this.attacks.length === 0)
+//                 this.evaluateSource();
         
         
     }
@@ -153,30 +155,28 @@ ResultsManager.prototype = {
         rv += "<td class=\"bar-status\">Failed:</td>";
         rv += '<td class="bar"><div style="width: ' +
                 Math.round((numFailed / numTestsRun)*100).toString() +
-                '% ; background-color: #FF3333;border: none;">&nbsp;</div></td>'+
+                '% ; background-color: #FF3333;color: white;border: none;">&nbsp;</div></td>'+
                 '<td class="percent">'+numFailed+'</td>';
         rv += '</tr><tr>';
         rv +="<td class=\"bar-status\">Warning:</td>" +
                 '</td>';
         rv += '<td class="bar"><div style="width: ' +
                 Math.round((numWarned / numTestsRun)*100).toString() + 
-                '%; background-color: #FFFF00;border: none;">&nbsp;</div></td>' +
+                '%; background-color: #FFFF00; color: white;border:none;">&nbsp;</div></td>' +
                 '<td class="percent">'+numWarned+'</td>';
         rv += '</tr><tr>';
         rv += "<td class=\"bar-status\">Passed:</td>" +
                 '<td class="bar"><div style="width: ' +
                 Math.round((numPassed / numTestsRun)*100).toString() + 
-                '%; background-color: #66ff66;border: none;">&nbsp;</div></td>'+
+                '%; background-color: #66ff66;color: white;border: none;">&nbsp;</div></td>'+
                 '<td class="percent">'+numPassed+'</td>';
-        rv +='</tr></table>\n';
+        rv +='</tr></table>';
         
         return rv;
     }
     ,
     showResults: function(){
-        if (this.attacks.length != 0 ||
-            this.httpresponseObservers.length != 0)
-        {
+        if (this.attacks.length != 0 || this.sourceListeners.length != 0){
             var self = this;
             setTimeout(function(){self.showResults()}, 1000);
             return;
@@ -189,7 +189,6 @@ ResultsManager.prototype = {
         var numPasses = this.getNumTestsPassed();
         var numWarnings = this.getNumTestsWarned();
         var numFailes = this.getNumTestsFailed();
-        
         var results="<html><head><link  rel=\"stylesheet\" type=\"text/css\""+
                 "href=\"chrome://sqlime/skin/results.css\"/>"+
                 "<title>Results</title></head><body>";
@@ -251,6 +250,8 @@ ResultsManager.prototype = {
                         results += '</li>';
                     }
                     results += '</ul>';
+                    results += '</fieldset>';
+                    
                     results += '</fieldset>\n';
                 }
             }
@@ -277,6 +278,8 @@ ResultsManager.prototype = {
                         results += '</li>';
                     }
                     results += '</ul>';
+                    results += '</fieldset>';
+                    
                     results += '</fieldset>\n';
                 }
                 
@@ -304,7 +307,7 @@ ResultsManager.prototype = {
                 addTab(file.path);
         getMainWindow().getBrowser().selectedTab=resultsTab;
         
-        
+        this.extensionManager.postTest();
         
     }
     ,
@@ -314,29 +317,92 @@ ResultsManager.prototype = {
     ,
     addObserver: function(attackRunner, attackHttpResponseObserver){
         
-        this.httpresponseObservers.push(attackHttpResponseObserver);
+        /*
+         * This will cause problems if the attackRunner 
+         */
+        this.httpresponseObservers[this.attacks.indexOf(attackRunner)] = 
+                attackHttpResponseObserver;
     }
     ,
     /**
-     * This evaluates an httpChannel for an attack. 
+     * This will cause problems if the attackRunner has been evaluated before
+     * this is called. However it evaluate is called on (or after) 
+     * DOMContentLoaded which should happen after a response code has been 
+     * received.
      */
-    gotChannelForAttackRunner: function( nsiHttpChannel, httpResponseObserver){
+    gotChannelForAttackRunner: function( nsiHttpChannel, attackRunner){
+        var attackHttpResponseObserver = 
+                this.httpresponseObservers[this.attacks.indexOf(attackRunner)];
         
         var observerService = Components.
                 classes['@mozilla.org/observer-service;1'].
                 getService(Components.interfaces.nsIObserverService);
         var results = checkForServerResponseCode(nsiHttpChannel)
         dump('resultmanager::gotChannelForAttackRunner results: ' + results + '\n');
-        if (results != null) {
+        if (results != null){
             dump('resultmanager::gotChannelForAttackRunner results: ' + results + '\n');
             this.addResults(results);
-            observerService.removeObserver(httpResponseObserver, 
+            observerService.removeObserver(attackHttpResponseObserver, 
                     AttackHttpResponseObserver_topic);
-            this.httpresponseObservers.splice(this.httpresponseObservers.
-                indexOf(httpResponseObserver), 1);
             
+            this.httpresponseObservers.
+                    splice(this.attacks.indexOf(attackRunner), 1);
         }
         
+    }
+    ,
+    /**
+     * 
+     */
+    addSourceListener:function(sourceListener, attackRunner){
+        this.sourceListeners.push(sourceListener);
+    }
+    ,
+    addSourceEvaluator: function(sourceEvaluator){
+        this.sourceEvaluators.push(sourceEvaluator);
+    }
+    ,
+//     evaluateSource: function() {
+//         
+//         for (var index in this.sourceListeners){
+//             var sourceListener = this.sourceListeners[index];
+//             if (sourceListener.done){
+//                 this.sourceListeners.splice(index, 1);
+//                 sourceListener.done = false;
+//                 for each(sourceEvaluator in this.sourceEvaluators){
+//                     var results = sourceEvaluator(sourceListener);
+//                     for each (var result in results){
+//                         result.testData = sourceListener.testData;
+//                     }
+//                     this.addResults(results);
+//                 }
+//             }
+//         }
+//         
+//         if (this.sourceListeners.length === 0){
+//             this.showResults();
+//         }
+//         else{
+//             var self = this;
+//             
+//             setTimeout(function(){self.evaluateSource()}, 1000);
+//             
+//         }
+//         
+//     }
+    evaluateSource: function(streamListener){
         
+        var attackRunner = streamListener.attackRunner;
+        
+        for each(sourceEvaluator in this.sourceEvaluators){
+            var results = sourceEvaluator(streamListener);
+            for each (var result in results){
+                result.testData = attackRunner.testData;
+            }
+            this.addResults(results);
+        }
+        
+        var index = this.sourceListeners.indexOf(streamListener);
+        this.sourceListeners.splice(index, 1);
     }
 };

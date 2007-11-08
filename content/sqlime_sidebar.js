@@ -38,7 +38,8 @@ function getMainHTMLDoc(){
  
 function extension(){
     //do nothing right now...
-    this.plistener=null;
+    this.plistener = null;
+    this.warningDialog = null;
 }
 
 extension.prototype = {
@@ -84,20 +85,19 @@ extension.prototype = {
     ,
     run_tests: function(event){
         
+        var canRunTests = this.preTest();
+        
+        if (canRunTests == false) {
+            alert('Could not run tests because tests are already running.');
+            return ;
+        }
+        
         var buttonClicked = event.explicitOriginalTarget;
         dump('have button (' + buttonClicked + ') with className ' + 
                 buttonClicked.className + ' and id ' + buttonClicked.id + '\n');
         
-        var resultsManager = new ResultsManager();
+        var resultsManager = new ResultsManager(this);
         resultsManager.addEvaluator(checkForErrorString);
-
-        var testRunnerContainer = getTestRunnerContainer(getMainWindow().
-                document.getElementById('content').mTabs.length);
-        
-        if (testRunnerContainer.keepChecking === false) {
-            testRunnerContainer.keepChecking = true;
-            testRunnerContainer.start();
-        }
         
         if (buttonClicked.className && buttonClicked.className === 'run_form_test'){
             var testType = this.getTestType();
@@ -486,6 +486,67 @@ extension.prototype = {
             getService(Components.interfaces.nsIPrefService);
         var branch = prefs.getBranch("extensions.sqlime.");
         return branch.getIntPref("prefnumattacks");   
+    }
+    ,
+    /**
+     * This function holds code that is general for any time we want to do a
+     * test
+     */
+    preTest: function() {
+        var rv = false;
+        if (this.warningDialog === null){
+            rv = true;
+            var testRunnerContainer = getTestRunnerContainer(getMainWindow().
+                    document.getElementById('content').mTabs.length);
+            
+            if (testRunnerContainer.keepChecking === false){
+                testRunnerContainer.keepChecking = true;
+                testRunnerContainer.start(); // if keepChecking is true than we
+                                             // it's already started
+            }
+            
+            this.warningDialog = window.openDialog(
+                    'chrome://sqlime/content/whiletestruns.xul',
+                    'whiletestruns',
+                    'chrome,dialog,dependant=yes');
+            
+            var prefService = Components.
+                    classes['@mozilla.org/preferences-service;1'].
+                    getService(Components.interfaces.nsIPrefService);
+
+            var branch = prefService.getBranch('dom');
+            if (branch.prefHasUserValue('max_chrome_script_run_time')) {
+                this.originalMaxChromeScriptRunTime = branch.
+                        getIntPref('max_chrome_script_run_time');
+            }
+            else {
+                this.originalMaxChromeScriptRunTime = null
+            }
+                    
+            branch.setIntPref('max_chrome_script_run_time', 0);
+            //disables the "script ran too long alert
+            
+        }
+        return rv;
+        
+    }
+    ,
+    postTest: function(){
+        this.warningDialog.close();
+        this.warningDialog = null;
+        var prefService = Components.
+                    classes['@mozilla.org/preferences-service;1'].
+                    getService(Components.interfaces.nsIPrefService);
+            
+        var branch = prefService.getBranch('dom');
+        if (this.originalMaxChromeScriptRunTime !== null) {
+            branch.setIntPref('max_chrome_script_run_time', this.
+                    originalMaxChromeScriptRunTime);
+        }
+        else {
+            branch.clearUserPref('max_chrom_script_run_time');
+        }
+        
     }
  }
 

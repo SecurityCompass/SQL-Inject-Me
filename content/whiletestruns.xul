@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE dialog PUBLIC "-//MOZILLA//DTD XUL V1.0//EN" "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
+
+<dialog id="dialog-name"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        title="Your SQL Injection Tests are running"
+        persist="screenX screenY"
+        buttons="accept"
+        ondialogaccept="return OK();">
+    <script type="application/x-javascript;version=1.7"
+        src="chrome://sqlime/content/whiletestruns.js" />
+    <description>Your tests are running. This will probably take a while.<xhtml:br />Please don't change tabs (that tab and it's state is being used as the basis for all tests) but you can use other windows.<xhtml:br />This window automatically close when the tests are done.</description>
+</dialog>
