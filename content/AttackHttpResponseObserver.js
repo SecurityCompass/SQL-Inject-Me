@@ -26,9 +26,14 @@ AttackHttpResponseObserver.prototype = {
         
         if (topic == AttackHttpResponseObserver_topic){
             try {
-                this.resultsManager.gotChannelForAttackRunner(subject.
-                        QueryInterface(Components.interfaces.nsIHttpChannel),
-                        this);
+                var channel = subject.
+                        QueryInterface(Components.interfaces.nsIHttpChannel)
+                if (channel.responseStatus < 300 ||
+                    channel.responseStatus >= 400)
+                {
+                    this.resultsManager.gotChannelForAttackRunner(channel,
+                            this);
+                }
             }
             catch(err) {
                 dump('AttackHttpResponseObserver::observe: ' + err + '\n');
