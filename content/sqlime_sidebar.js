@@ -40,6 +40,7 @@ function extension(){
     //do nothing right now...
     this.plistener = null;
     this.warningDialog = null;
+    this.typeAheadSound = true; //default for 
 }
 
 extension.prototype = {
@@ -528,6 +529,14 @@ extension.prototype = {
             branch.setIntPref('max_chrome_script_run_time', 0);
             //disables the "script ran too long alert
             
+            branch = prefService.getBranch('accessibility.typeaheadfind.');
+            if (branch.prefHasUserValue('enablesound')) {
+                this.typeAheadSound = branch.getBoolPref('enablesound');
+            }
+            branch.setBoolPref('enablesound', false);
+            
+            
+            
         }
         return rv;
         
@@ -548,6 +557,8 @@ extension.prototype = {
         else {
             branch.clearUserPref('max_chrom_script_run_time');
         }
+        branch = prefService.getBranch('accessibility.typeaheadfind.');
+        branch.setBoolPref('enablesound', this.typeAheadSound);
         
     }
  }
