@@ -307,6 +307,8 @@ extension.prototype = {
         var tabbox = document.createElement('tabbox');
         var tabs = document.createElement('tabs');
         var tabpanels = document.createElement('tabpanels');
+        var fieldsLabel = document.createElement('label');
+        fieldsLabel.setAttribute('value', "These are the fields in this form:");
         
         tabbox.setAttribute('id', 'sidebarformtabbox');
         //we only want to put things in a clean box.
@@ -402,7 +404,7 @@ extension.prototype = {
             
             //Add the form UI to the DOM.
             for (var i =0; i < newTabs.length; i++) {
-                
+                newTabPanelVbox[i].appendChild(fieldsLabel.cloneNode(true));
                 for each(var fieldUI in newTabForms[i]) {
                     dump(q++ + 'appending ui :' + fieldUI + '\n');
                     newTabPanelVbox[i].appendChild(fieldUI);
