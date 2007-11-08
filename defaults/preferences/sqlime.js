@@ -2,3 +2,4 @@ pref('extensions.sqlime.attacks', '[{"string":"foo7","sig":"tom"},{"string":"foo
 pref('extensions.sqlime.errorstrings', '[{"string":"Database Error"}, {"string":"DB Err"}]');
 pref('extensions.sqlime.prefnumattacks', 9);
 pref('extensions.sqlime.showcontextmenu', true);
+pref('extensions.sqlime.numtabstouse', 9);
