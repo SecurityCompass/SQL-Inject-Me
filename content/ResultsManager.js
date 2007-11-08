@@ -78,9 +78,7 @@ ResultsManager.prototype = {
                 
             }
             
-//             if (this.attacks.length === 0)
-//                 this.evaluateSource();
-        
+
         
     }
     ,  
@@ -320,8 +318,7 @@ ResultsManager.prototype = {
         /*
          * This will cause problems if the attackRunner 
          */
-        this.httpresponseObservers[this.attacks.indexOf(attackRunner)] = 
-                attackHttpResponseObserver;
+        this.httpresponseObservers.push(attackHttpResponseObserver);
     }
     ,
     /**
@@ -330,23 +327,21 @@ ResultsManager.prototype = {
      * DOMContentLoaded which should happen after a response code has been 
      * received.
      */
-    gotChannelForAttackRunner: function( nsiHttpChannel, attackRunner){
-        var attackHttpResponseObserver = 
-                this.httpresponseObservers[this.attacks.indexOf(attackRunner)];
-        
-        var observerService = Components.
-                classes['@mozilla.org/observer-service;1'].
-                getService(Components.interfaces.nsIObserverService);
+    gotChannelForAttackRunner: function( nsiHttpChannel, attackHttpResponseObserver){
+       
         var results = checkForServerResponseCode(nsiHttpChannel)
         dump('resultmanager::gotChannelForAttackRunner results: ' + results + '\n');
         if (results != null){
             dump('resultmanager::gotChannelForAttackRunner results: ' + results + '\n');
             this.addResults(results);
+            var observerService = Components.
+                classes['@mozilla.org/observer-service;1'].
+                getService(Components.interfaces.nsIObserverService);
             observerService.removeObserver(attackHttpResponseObserver, 
                     AttackHttpResponseObserver_topic);
             
             this.httpresponseObservers.
-                    splice(this.attacks.indexOf(attackRunner), 1);
+                    splice(this.attacks.indexOf(attackHttpResponseObserver), 1);
         }
         
     }
@@ -362,34 +357,6 @@ ResultsManager.prototype = {
         this.sourceEvaluators.push(sourceEvaluator);
     }
     ,
-//     evaluateSource: function() {
-//         
-//         for (var index in this.sourceListeners){
-//             var sourceListener = this.sourceListeners[index];
-//             if (sourceListener.done){
-//                 this.sourceListeners.splice(index, 1);
-//                 sourceListener.done = false;
-//                 for each(sourceEvaluator in this.sourceEvaluators){
-//                     var results = sourceEvaluator(sourceListener);
-//                     for each (var result in results){
-//                         result.testData = sourceListener.testData;
-//                     }
-//                     this.addResults(results);
-//                 }
-//             }
-//         }
-//         
-//         if (this.sourceListeners.length === 0){
-//             this.showResults();
-//         }
-//         else{
-//             var self = this;
-//             
-//             setTimeout(function(){self.evaluateSource()}, 1000);
-//             
-//         }
-//         
-//     }
     evaluateSource: function(streamListener){
         
         var attackRunner = streamListener.attackRunner;
