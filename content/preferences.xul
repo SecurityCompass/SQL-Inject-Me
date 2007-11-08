@@ -6,9 +6,11 @@
     <prefpane label="General" id="sqligen" >
         <preferences>
             <preference id="preferedNumAttacks" name="extensions.sqlime.prefnumattacks" type="int"/>
+            <preference id="showContextMenu" name="extensions.sqlime.showcontextmenu" type="bool" instantApply='true'/>
         </preferences>
         <label value="Prefered Number of Attacks to Test" control="preferedNumAttacksTxtBox" />
         <textbox id="preferedNumAttacksTxtBox" preference="preferedNumAttacks" />
+        <checkbox label="Show Context Menu" preference="showContextMenu" />
     </prefpane>
     <prefpane label="SQL Injection Strings" id="sqlistrings">
         <preferences>
