@@ -1,12 +1,18 @@
-#form1_field1_menulist.activated .menulist-editable-input,
-#form1_field2_menulist.activated .menulist-editable-input 
-{
-    background-color: yellow !important;
+
+radio {
+  list-style-image: url("chrome://browser/skin/preferences/Options.png"); 
 }
 
-#form1_field1_checkbox .checkbox-label-box,
-#form1_field2_checkbox .checkbox-label-box,
-.nolabel .checkbox-label-box
-{
-    display: none;
+radio[pane=sqligen] {
+	-moz-image-region: rect(0px, 32px,  32px, 0px);
+}
+
+radio[pane=sqligen]:hover, 
+radio[pane=sqligen][selected="true"]  {
+	-moz-image-region: rect(32px, 32px,  64px, 0px)
+}
+
+
+radio[pane=sqlistrings] {
+	-moz-image-region: rect(32px, 224px,  64px, 192px);
 }
