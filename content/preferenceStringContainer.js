@@ -42,6 +42,8 @@ PreferenceStringContainer.prototype = {
         preference.sig = signature;
         if (this.strings.every(checkUnique, preference)){
             this.strings.push(preference);
+            dump('PreferenceStringContainer::addString preference == ' +
+                 preference + '\n');
             this.save();
             return true;
         }

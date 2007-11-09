@@ -18,6 +18,8 @@ ErrorStringContainer.prototype.init = function (){
 };
 
 ErrorStringContainer.prototype.save = function() {
+        dump('ErrorStringContainer::save this.strings ' +this.strings + '\n');
+        dump('ErrorStringContainer::save typeof(this.strings) ' +typeof( this.strings )+ '\n');
         this.prefBranch.setCharPref('errorstrings', JSON.toString(this.strings));
 }
     

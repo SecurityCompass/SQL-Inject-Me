@@ -104,6 +104,16 @@ PreferencesController.prototype = {
             xmlAttacks.appendChild(xmlAttack);
         }
         root.appendChild(xmlAttacks);
+        var xmlErrStrings = exportDoc.createElement('results');
+        var errorStrings = getErrorStringContainer().getStrings();
+        for each (var errStr in errorStrings){
+            var xmlError = exportDoc.createElement('resultString');
+            var txtString = exportDoc.
+                    createCDATASection(encodeXML(errStr.string));
+            xmlError.appendChild(txtString);
+            xmlErrStrings.appendChild(xmlError);
+        }
+        root.appendChild(xmlErrStrings);
         exportDoc.appendChild(root);
         var serializer = new XMLSerializer();
         var xml = serializer.serializeToString(exportDoc);
@@ -158,7 +168,6 @@ PreferencesController.prototype = {
         var attackStringContainer = getAttackStringContainer();
         
         for (var i = 0; i < attacksTag.childNodes.length; i++){
-            
 //             alert("'" + (attackTag.firstChild.firstChild.nodeName  == '#text')+"'");
             dump("::importAttacks()... (" + attacksTag + "== attacksTag) attacksTag[" + i + "] == " + attacksTag.childNodes[i] + "\n");
             if ("attack" === attacksTag.childNodes[i].nodeName){
@@ -204,6 +213,25 @@ PreferencesController.prototype = {
         else {
             alert("Couldn't find any attacks. No Attacks imported.");
             return false;            
+        }
+        
+        var errStrings = dom.getElementsByTagName('results');
+        if (errStrings.length === 1) {
+            var errStrings = errStrings[0];
+            var errTags = new Array();
+            for each(var errTag in errStrings.childNodes){
+                if (errTag.nodeName == 'resultString') {
+                    errTags.push(errTag);
+                }
+            }
+            
+            if (errTags.length) {
+                var errStringContainer = getErrorStringContainer();
+                for each(var errTag in errTags) {
+                    dump('preference.js::importAttacks errTag.textContent == ' + errTag.textContent + '\n');
+                    errStringContainer.addString(decodeXML(errTag.textContent), null);
+                }
+            }
         }
         this.makeUI(getAttackStringContainer().getStrings(), window, 'existingSQLIstrings');
         this.makeUI(getErrorStringContainer().getStrings(), window, 'existingSQLIerrStrings');
