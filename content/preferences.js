@@ -122,6 +122,10 @@ PreferencesController.prototype = {
         var nsIFilePicker = Components.interfaces.nsIFilePicker;
         var picker = Components.classes['@mozilla.org/filepicker;1'].createInstance(nsIFilePicker);
         picker.init(window, "Select File To Export To", nsIFilePicker.modeSave);
+        //picker.appendFilters(nsIFilePicker.filterAll|nsIFilePicker.filterXML);
+        picker.appendFilter('XML Files', '*.xml');
+        picker.appendFilter('All Files', '*');
+        picker.defaultExtension - '.xml';
         var resultOfPicker = picker.show();
         if (resultOfPicker == nsIFilePicker.returnCancel){
             return false;
@@ -142,6 +146,9 @@ PreferencesController.prototype = {
         var nsIFilePicker = Components.interfaces.nsIFilePicker;
         var picker = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
         picker.init(window, "Select File To Import From", nsIFilePicker.modeOpen);
+        //picker.appendFilters(nsIFilePicker.filterAll|nsIFilePicker.filterXML);
+        picker.appendFilter('XML Files', '*.xml');
+        picker.appendFilter('All Files', '*');
         var resultOfPicker = picker.show();
         if (resultOfPicker == nsIFilePicker.returnCancel){
             return false;
