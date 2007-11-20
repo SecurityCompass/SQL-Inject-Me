@@ -6,7 +6,7 @@
 <vbox>
   <box><image src="chrome://sqlime/skin/logo_sc.png" /> </box> 
   <text value="SQL Inject Me" style="font-weight: bold; font-size: x-large;"/>
-  <text value="Version 1.0"/>
+  <text value="Beta 1"/>
   <separator class="thin"/>
   <text value="Created By" style="font-weight: bold;"/>
   <text value="Security Compass"/>
