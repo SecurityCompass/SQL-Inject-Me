@@ -8,6 +8,7 @@
     <em:creator>Security Compass</em:creator>
     <em:description>An Extension to test for SQL Injection Vulnerabilities</em:description>
     <em:optionsURL>chrome://sqlime/content/preferences.xul</em:optionsURL>
+    <em:iconURL>chrome://sqlime/skin/tiny_logo.png</em:iconURL>
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- firefox -->

@@ -244,10 +244,10 @@ ResultsManager.prototype = {
         var testDataList = fieldResult.getSubmitState();
         for each(var testData in testDataList) {
             if (testData.tested ===true){
-                testFieldName = (testData.name.length > 0 ? testData.name : ("unnamed field " + ++unamedFieldCounter));
+                testFieldName = (testData.name !== undefined ? testData.name : ("unnamed field " + ++unamedFieldCounter));
                 break;
             }
-            else if (testData.name.length === 0) {
+            else if (testData.name === undefined) {
                 unamedFieldCounter++;
             }
         }
@@ -257,9 +257,9 @@ ResultsManager.prototype = {
         unamedFieldCounter = 0;
         for each(var testData in testDataList) {
             if (testData.tested === false){
-                rv += "<li>" + (testData.name.length > 0 ? testData.name : ("unnamed field " + ++unamedFieldCounter)) + ": " + testData.data + "</li>";
+                rv += "<li>" + (testData.name !== undefined? testData.name : ("unnamed field " + ++unamedFieldCounter)) + ": " + testData.data + "</li>";
             }
-            else if (testData.name.length === 0) {
+            else if (testData.name === undefined) {
                 unamedFieldCounter++;
             }
         }
@@ -292,7 +292,7 @@ ResultsManager.prototype = {
                     rv += encodeString(testData.data);
                     break;
                 }
-                else if (testData.name.length == 0 ) {
+                else if (testData.name === undefined) {
                     unamedFieldCounter++;
                 }
             }

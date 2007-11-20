@@ -463,12 +463,13 @@ extension.prototype = {
         
         var mainWindow = getMainWindow();
         var ourCaller = this;
+        this.windowEventClosure = function(){ourCaller.do_generate_form_ui()};
         mainWindow.getBrowser().tabContainer.
                 addEventListener("TabSelect", 
-                function(){ourCaller.do_generate_form_ui()}, false);
+                this.windowEventClosure, false);
         
         this.plistener = new sqlimeProgressListener(
-            function(){ourCaller.do_generate_form_ui()});
+            this.windowEventClosure);
         
         mainWindow.document.getElementById('content').
                 addProgressListener(this.plistener,
@@ -480,7 +481,10 @@ extension.prototype = {
         var mainWindow = getMainWindow();
         
         mainWindow.document.getElementById('content').
-                addProgressListener(this.plistener);
+                removeProgressListener(this.plistener);
+                
+        mainWindow.removeEventListener('TabSelect', this.windowEventClosure, false);
+        this.windowEventClosure = null;
         
     }
     ,
@@ -517,7 +521,7 @@ extension.prototype = {
                     classes['@mozilla.org/preferences-service;1'].
                     getService(Components.interfaces.nsIPrefService);
 
-            var branch = prefService.getBranch('dom');
+            var branch = prefService.getBranch('dom.');
             if (branch.prefHasUserValue('max_chrome_script_run_time')) {
                 this.originalMaxChromeScriptRunTime = branch.
                         getIntPref('max_chrome_script_run_time');
@@ -535,8 +539,6 @@ extension.prototype = {
             }
             branch.setBoolPref('enablesound', false);
             
-            
-            
         }
         return rv;
         
@@ -549,7 +551,7 @@ extension.prototype = {
                     classes['@mozilla.org/preferences-service;1'].
                     getService(Components.interfaces.nsIPrefService);
             
-        var branch = prefService.getBranch('dom');
+        var branch = prefService.getBranch('dom.');
         if (this.originalMaxChromeScriptRunTime !== null) {
             branch.setIntPref('max_chrome_script_run_time', this.
                     originalMaxChromeScriptRunTime);
@@ -643,7 +645,7 @@ function createFieldUI(node){
     for (var i = 0; i < attacks.length; i++){
         var aMenuItem = document.createElement("menuitem");
         aMenuItem.setAttribute('label', attacks[i].string);
-        aMenuItem.setAttribute('width', '15 em');
+        aMenuItem.setAttribute('width', '100');
         aMenuItem.setAttribute('crop', 'end');
         menupopup.appendChild(aMenuItem);
         dump("menupopup childnodes length: " + menupopup.childNodes.length+"\n");
