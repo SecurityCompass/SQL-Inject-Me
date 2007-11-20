@@ -2,9 +2,9 @@
  * Result.js
  */
  
-const RESULT_TYPE_ERROR = 1;
-const RESULT_TYPE_WARNING = 2;
-const RESULT_TYPE_PASS = 3;
+const RESULT_TYPE_ERROR = 0x0004;
+const RESULT_TYPE_WARNING =0x0002;
+const RESULT_TYPE_PASS = 0x0001;
 
 /**
  * The Result object is returned by evalutors.
@@ -17,7 +17,6 @@ function Result(type, value, message){
     this.value = value;
     this.type = type;
     this.message = message;
-    this.testData = null;
     dump('Result::Ctor (' + type+ ' ' + value+ ' ' + message + '\n');
 }
 

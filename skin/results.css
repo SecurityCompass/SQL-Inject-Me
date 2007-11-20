@@ -23,8 +23,9 @@ p {
 }
 
 .bar-status{
-    text-align: left;
-    width: 6 em;
+    text-align: right;
+    width: 10%;
+    white-space: pre;
 }
 .bar {
     width: 99%;
@@ -65,4 +66,21 @@ ul {
 }
 li {
     margin-top: .5em;
+}
+
+.errors {
+    background-color: #ffAAAA;
+}
+.warn {
+    background-color: #FFFF33;
+}
+.pass {
+    background-color: #66FF66;
+}
+ul.errors, ul.warn, ul.pass {
+    margin: 0;
+    padding: 1em;
+}
+legend {
+    font-size:large;
 }

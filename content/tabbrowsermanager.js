@@ -82,7 +82,12 @@ TabManager.prototype = {
     }
     ,
     writeTabForms: function(forms, testFormIndex, testFieldIndex, testValue){
-        dump('writeTabForms::forms ' + forms[0] + '\n');
+        dump('-=-=-=-writeTabForms::forms ' + forms[0]); 
+        if (forms[testFormIndex] === undefined){
+            dump('got an undefined\n');   
+        }
+        dump('&& and the test form is : '+forms[testFormIndex]+ ' with '+
+                forms[testFormIndex].elements.length+'elements\n');
         for (var formIndex = 0;
              formIndex < forms.length;
              formIndex++)
@@ -119,7 +124,7 @@ TabManager.prototype = {
                     element.checked = this.tabForms[formIndex][elementIndex];
                 }
                 else {
-                    element.value = this.tabForms[formIndex][elementIndex];;
+                    element.value = this.tabForms[formIndex][elementIndex];
                 }
             }
         }
@@ -152,4 +157,30 @@ TabManager.prototype = {
         this.writeTabForms(tab.linkedBrowser.contentDocument.forms );
        
     }
-}
+    ,
+    /**
+     * This returns the data in a form 
+     */
+    getFormDataForURL: function(forms, testFormIndex, testFieldIndex, 
+            testValue)
+    {
+        dump('getFormDataForURL::forms forms['+testFormIndex|']==' + forms[testFormIndex] + '\n');
+        var formIndex = testFormIndex;
+        var rv = '';
+        for (var elementIndex = 0; 
+            elementIndex < forms[testFormIndex].elements.length; 
+            elementIndex++)
+        {
+            var element = forms[testFormIndex].elements[elementIndex];
+            if (element.value) {
+                if (rv.length != 0){
+                    rv+='&';
+                }                
+                rv += element.name +'='+element.value;
+            }
+        }
+        dump('tabbrowsermanager::getFormDataForURL returns: ' + rv + '\n');
+        return rv;
+        
+    }
+};

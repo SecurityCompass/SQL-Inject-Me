@@ -51,6 +51,10 @@ AttackRunner.prototype = {
         var tabManager = new TabManager();
         var self = this; //make sure we always have a reference to this object
         
+        this.testValue = testValue;
+        this.formIndex = formIndex;
+        this.fieldIndex = field.index;
+        
         dump('do_test::curentTab:' + currentTab + '\n');
         tabManager.readTabData(currentTab);
         dump('do_test... tabManager: ' + tabManager + '\n');
@@ -62,6 +66,7 @@ AttackRunner.prototype = {
             
         function afterWorkTabStopped(event){
             dump('start afterWorkTabStopped\n');
+            workTab.linkedBrowser.webNavigation.stop(STOP_ALL);
             
             workTab.linkedBrowser.addEventListener('pageshow', 
                     afterWorkTabHasLoaded, false);            
@@ -74,17 +79,28 @@ AttackRunner.prototype = {
         
         function afterWorkTabHasLoaded(event) {
             dump('start afterWorkTabHasLoaded\n');
+            var formData = null;
+            workTab.linkedBrowser.removeEventListener('pageshow', 
+                    afterWorkTabHasLoaded, false);
+            
+            //I'm not so sure that this speeds anything up...
+            //It's also kind of dangerous, if it runs before the listener is
+            //removed it can do trigger this function again.
+            workTab.linkedBrowser.webNavigation.stop(STOP_ALL);
             
             //this will copy all the form data...
             if (field){
                 tabManager.writeTabForms(workTab.linkedBrowser.contentDocument.
                         forms,  formIndex, field.index, testValue);
-                
+                formData = tabManager.getFormDataForURL(workTab.linkedBrowser.
+                        contentDocument.forms,  formIndex, field.index, 
+                        testValue);
             }
             else {
                 tabManager.writeTabForms(workTab.linkedBrowser.contentDocument.
                         forms,  formIndex, null, null);
-                
+                formData = tabManager.getFormDataForURL(workTab.linkedBrowser.
+                        contentDocument.forms,  formIndex, null, null);
             }
             self.testData = tabManager.getTabData(workTab.linkedBrowser.
                     contentDocument.forms,  formIndex, field.index);
@@ -121,7 +137,10 @@ AttackRunner.prototype = {
         //this should fire only *after* the form has been sumbitted and the new
         //page has loaded.
         function afterWorkTabHasSubmittedAndLoaded(event){
-            resultsManager.evaluate(workTab.linkedBrowser, self);
+            var results = resultsManager.evaluate(workTab.linkedBrowser, self);
+            for each (result in results){
+                tabManager.addFieldData(result);
+            }
             mainBrowser.removeTab(workTab);
         }
         

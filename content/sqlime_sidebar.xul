@@ -18,6 +18,8 @@
             src="chrome://sqlime/content/tabbrowsermanager.js" />
     <script type="application/x-javascript;version=1.7"
             src="chrome://sqlime/content/Results.js" />
+    <script type="application/x-javascript;version=1.7"
+            src="chrome://sqlime/content/FieldResult.js" />
     <script type="application/x-javascript;version=1.7" 
             src="chrome://sqlime/content/ResultsManager.js" />
     <script type="application/x-javascript;version=1.7"
@@ -40,7 +42,7 @@
         <command id="sqlime_generate_form_ui" oncommand="setTimeout(function(){sqlimeExtension.do_generate_form_ui()}, 1);" />
         <command id="sqlime_do_test" oncommand="sqlimeExtension.run_tests(event)" />
     </commandset>
-    <box><image src="chrome://sqlime/skin/logo_sc.png" /> </box>
+    <box><image src="chrome://sqlime/skin/small_logo_sc.png" /> </box>
     <label style="font-size: xx-large" class="title">SQL Inject Me</label>
     <vbox style="overflow:auto;" flex="1">
         <description>
