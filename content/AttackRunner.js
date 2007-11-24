@@ -66,7 +66,6 @@ AttackRunner.prototype = {
             
         function afterWorkTabStopped(event){
             dump('start afterWorkTabStopped\n');
-            workTab.linkedBrowser.webNavigation.stop(STOP_ALL);
             
             workTab.linkedBrowser.addEventListener('pageshow', 
                     afterWorkTabHasLoaded, false);            
@@ -82,11 +81,6 @@ AttackRunner.prototype = {
             var formData = null;
             workTab.linkedBrowser.removeEventListener('pageshow', 
                     afterWorkTabHasLoaded, false);
-            
-            //I'm not so sure that this speeds anything up...
-            //It's also kind of dangerous, if it runs before the listener is
-            //removed it can do trigger this function again.
-            workTab.linkedBrowser.webNavigation.stop(STOP_ALL);
             
             //this will copy all the form data...
             if (field){
@@ -107,9 +101,14 @@ AttackRunner.prototype = {
             dump('attackRunner::testData == ' + this.testData + '\n');
             dump('tab data should be written now\n');
             
-            setTimeout(function() {
-                    workTab.linkedBrowser.removeEventListener('pageshow', 
-                    afterWorkTabHasLoaded, false)}, 1);
+            if (window.navigator.platform.match("win", "i")) {
+                workTab.linkedBrowser.addEventListener('pageshow', 
+                        afterWorkTabHasSubmittedAndLoaded, false);
+            }
+            else {
+                setTimeout(function(){workTab.linkedBrowser.addEventListener('pageshow', 
+                        afterWorkTabHasSubmittedAndLoaded, false)}, 1);
+            }
                     
             if (resultsManager)
             {
