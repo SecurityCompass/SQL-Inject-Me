@@ -37,12 +37,12 @@ TabManager.prototype = {
             for (var j = 0; j < forms[i].elements.length; j++)
             {
                 var elem = forms[i].elements[j];
-                if (elem.nodeType == 'submit' || elem.nodeType == 'reset' || elem.nodeType == 'image' || elem.nodeType == 'button')
+                if (elem.nodeName.toLowerCase() == 'submit' || elem.nodeName.toLowerCase() == 'reset' || elem.nodeName.toLowerCase() == 'image' || elem.nodeName.toLowerCase() == 'button')
                 {
                     //this just keeps all the arrays parallell
                     this.tabForms[i].push(null);
                 }
-                else if (elem.nodeType == 'checkbox' || elem.nodeType == 'radio')
+                else if (elem.nodeName.toLowerCase() == 'checkbox' || elem.nodeName.toLowerCase() == 'radio')
                 {
                     this.tabForms[i].push(elem.checked);
                 }
@@ -106,20 +106,29 @@ TabManager.prototype = {
                 {
                     dump('going to force element ' +element.name  +' ('+ elementIndex
                             +') to have value ' + testValue+ '\n');
-                    element.value = testValue.string;
+                    if(element.nodeName.toLowerCase() === 'select') {
+                        var newOption = forms[formIndex].ownerDocument.createElement('option');
+                        newOption.setAttribute('value', testValue.string);
+                        newOption.innerHTML = testValue.string;
+                        element.options[element.options.length] = newOption;
+                        element.selectedIndex = element.options.length - 1;
+                    }
+                    else {
+                        element.value = testValue.string;
+                    }
                     dump('element[' + elementIndex + '] has value' + 
                             element.value + ' \n');
                 }
-                else if (element.nodeType == 'submit' || 
-                         element.nodeType == 'reset' || 
-                         element.nodeType == 'image' || 
-                         element.nodeType == 'button')
+                else if (element.nodeName.toLowerCase() == 'submit' || 
+                         element.nodeName.toLowerCase() == 'reset' || 
+                         element.nodeName.toLowerCase() == 'image' || 
+                         element.nodeName.toLowerCase() == 'button')
                 {
                     // don't care, this is here just to make sure the elements 
                     // are parallel.
                 } 
-                else if (element.nodeType == 'checkbox' || 
-                         element.nodeType == 'radio') 
+                else if (element.nodeName.toLowerCase() == 'checkbox' || 
+                         element.nodeName.toLowerCase() == 'radio') 
                 {
                     element.checked = this.tabForms[formIndex][elementIndex];
                 }

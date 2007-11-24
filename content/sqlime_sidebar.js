@@ -77,7 +77,7 @@ extension.prototype = {
         for(var i =0; i < fieldUIs.length; i++){
             if (fieldUIs[i].checked || all === true){
                 var fieldToTest = new Object();
-                fieldToTest.index = i;
+                fieldToTest.index = parseInt(fieldUIs[i].getAttribute('formElementIndex'));
                 fieldsToTest.push(fieldToTest);
             }
         }
@@ -371,18 +371,18 @@ extension.prototype = {
                         if (aForm.elements[n].name){
                             sidebarElement = 
                                     fieldsWithUI[aForm.elements[n].name] =
-                                    createFieldUI(aForm.elements[n]);
+                                    createFieldUI(aForm.elements[n], n);
                         }
                         else if (aForm.elements[n].id){
                             sidebarElement =
                                     fieldsWithUI[aForm.elements[n].id] =
-                                    createFieldUI(aForm.elements[n]);
+                                    createFieldUI(aForm.elements[n], n );
                         }
                         else {
                             sidebarElement = 
                                     fieldsWithUI["form" + n + "_"+ 
                                     Math.round(Math.random() * 10000000)] =
-                                    createFieldUI(aForm.elements[n]);
+                                    createFieldUI(aForm.elements[n], n);
                         }
                         sidebarElement = sidebarElement.getElementsByAttribute('editable', 'true')[0];
                         this.syncSidebarToForm(sidebarElement, aForm.elements[n]);
@@ -601,9 +601,10 @@ function getFormFieldsUI(aForm, allFields) {
  * Another option is to use XBL but it really doesn't seem to be worth 
  * the effort
  * @param node a form field
+ * @param elementIndex the index of the element in the form's elements array.
  * @returns the root of the ui for a form field (a groupbox).
  */
-function createFieldUI(node){
+function createFieldUI(node, elementIndex){
     
 //     var uid = Math.round(Math.random() * 100000000000);
     dump("creating field ui\n");
@@ -623,6 +624,7 @@ function createFieldUI(node){
     dump("creating field ui...\n");
     var checkbox = document.createElement("checkbox");
     checkbox.className = "nolabel";
+    checkbox.setAttribute('formElementIndex', elementIndex);
     
     var menulist = document.createElement("menulist");
     menulist.setAttribute("editable", true);
