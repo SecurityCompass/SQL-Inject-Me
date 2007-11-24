@@ -257,7 +257,7 @@ ResultsManager.prototype = {
         unamedFieldCounter = 0;
         for each(var testData in testDataList) {
             if (testData.tested === false){
-                rv += "<li>" + (testData.name !== undefined? testData.name : ("unnamed field " + ++unamedFieldCounter)) + ": " + testData.data + "</li>";
+                rv += "<li>" + (testData.name !== undefined? testData.name : ("unnamed field " + ++unamedFieldCounter)) + ": " + encodeString(testData.data) + "</li>";
             }
             else if (testData.name === undefined) {
                 unamedFieldCounter++;
