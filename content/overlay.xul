@@ -18,9 +18,6 @@
                 />
                 <menuitem label="&sqlime.about;" oncommand="window.openDialog('chrome://sqlime/content/about.xul');" />
                 <menuitem label="&sqlime.help;" oncommand="window.open('http://www.securitycompass.com', 'helpwindow', '');" />  
-                <menuseparator />
-                <menuitem label="Test Reulsts Page (to be removed, for demo only)" 
-                          oncommand="var tab = getBrowser().addTab('chrome://sqlime/content/results.html'); gBrowser.selectedTab = tab;" />
             </menupopup>
         </menu>
     </menupopup>
