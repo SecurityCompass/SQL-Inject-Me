@@ -9,7 +9,8 @@
         title="Your SQL Injection Tests are running"
         persist="screenX screenY"
         buttons="accept"
-        ondialogaccept="return OK();">
+        ondialogaccept="return OK();"
+        ondialogcancel="return OK();">
     <script type="application/x-javascript;version=1.7"
         src="chrome://sqlime/content/whiletestruns.js" />
     <description>Your tests are running. This will probably take a while.<xhtml:br />Please don't change tabs (that tab and it's state is being used as the basis for all tests) but you can use other windows.<xhtml:br />This window automatically close when the tests are done.</description>
