@@ -21,6 +21,9 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with SQL Inject Me.  If not, see <http://www.gnu.org/licenses/>.
+
+If you have any questions regarding SQL Inject Me please contact
+tools@securitycompass.com
 -->
         <preferences>
             <preference id="preferedNumAttacks" name="extensions.sqlime.prefnumattacks" type="int"/>
