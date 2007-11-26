@@ -27,7 +27,7 @@ tools@securitycompass.com
     <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/PrefObserver.js" />
     <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/overlay.js" />
     <menupopup id="menu_ToolsPopup">
-        <menu id="sqlime-tools" label="SQL Inject ME"  insertafter="devToolsSeparator" accesskey="x">
+        <menu id="sqlime-tools" label="SQL Inject ME"  insertafter="devToolsSeparator" accesskey="S">
             <menupopup>
                 <menuitem 
                         label="Open SQL Inject Me Sidebar" 
