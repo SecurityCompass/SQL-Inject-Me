@@ -2,7 +2,8 @@
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://sqlime/skin/preferences.css" type="text/css"?>
 <prefwindow id="sqlimePreferences" title="SQL Inject ME Options"
-    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <prefpane label="General" id="sqligen" >
         <!-- 
 Copyright 2007 Security Compass
@@ -52,6 +53,7 @@ tools@securitycompass.com
         </hbox>
         <groupbox>
             <caption label="SQL Injection Strings" />
+            <description>IMPORTANT:Please close then open the sidebar (or refresh the current webpage) to make sure that all new attack strings are reloaded.</description>
             <label style="visibility:hidden;color: red" value="No attacks, please enter some" id="noattackslbl" />
             <hbox>
                 <listbox id="existingSQLIstrings" rows="10" seltype="multiple" flex="1">
