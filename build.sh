@@ -44,11 +44,13 @@ else
   . $1
 fi
 
+
 if [ -z $APP_NAME ]; then
   echo "You need to create build config file first!"
   echo "Read comments at the beginning of this script for more info."
   exit;
 fi
+echo "$ROOT_FILES"
 
 ROOT_DIR=`pwd`
 TMP_DIR=build
@@ -83,10 +85,11 @@ for DIR in $ROOT_DIRS; do
   echo $FILES >> files
   cp --verbose --parents $FILES $TMP_DIR
 done
-
+echo "copying files: $ROOT_FILES "
 # Copy other files to the root of future XPI.
 for ROOT_FILE in $ROOT_FILES install.rdf chrome.manifest; do
   cp --verbose $ROOT_FILE $TMP_DIR
+  echo ${ROOGFILE}
   if [ -f $ROOT_FILE ]; then
     echo $ROOT_FILE >> files
   fi
