@@ -67,7 +67,7 @@ tools@securitycompass.com
     <label style="font-size: xx-large" class="title">SQL Inject Me</label>
     <vbox style="overflow:auto;" flex="1">
         <description>
-            SQL Inject Me lets you test the page you're viewing for Cross Site Scripting vulnerabilities.
+            SQL Inject Me lets you test the page you're viewing for SQL Injection vulnerabilities.
         </description>
         <description>
             Each tab represents a form on the page and lists all the fields. Just fill in good values for all the fields and mark which ones are to be tested (they will become yellow) then click either "Test with All Attacks" or "Test with Top Attacks".
