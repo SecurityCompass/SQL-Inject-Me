@@ -25,6 +25,7 @@ tools@securitycompass.com
  * requires preferenceStringContainer.js
  */
 
+
 /**
  *this object is responsible for dealing with the Attack Strings.
  */
@@ -38,15 +39,17 @@ AttackStringContainer.prototype.init = function (){
         var attackStrings;
         
         this.prefBranch = this.prefService.getBranch('extensions.sqlime.');
+        this.prefDefaultBranch = this.prefService.getDefaultBranch('extensions.sqlime.')
         attackStrings = this.prefBranch.getCharPref('attacks');
         this.strings = JSON.fromString(attackStrings);
 
-    };
-    AttackStringContainer.prototype.save = function() {
-        this.prefBranch.setCharPref('attacks', JSON.toString(this.strings));
         
-    }
+    };
+AttackStringContainer.prototype.save = function() {
+    this.prefBranch.setCharPref('attacks', JSON.toString(this.strings));
     
+}
+
 
 function getAttackStringContainer(){
     if (typeof(attackStringContainer) === 'undefined' || !attackStringContainer){

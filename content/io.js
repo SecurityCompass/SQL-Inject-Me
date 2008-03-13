@@ -58,7 +58,17 @@ if (typeof(JSIO) != 'boolean') {
                 return false;
             }
         },
-
+        readChannel  : function(channel, charset){
+            var data = new String();
+            var inStream = channel.open();
+            var scriptableInStream = Components.classes["@mozilla.org/scriptableinputstream;1"].
+                    createInstance().QueryInterface(Components.interfaces.nsIScriptableInputStream);
+            scriptableInStream.init(inStream);
+            
+            data = scriptableInStream.read(scriptableInStream.available());
+            
+            return data;            
+        },
         read   : function(file, charset) {
             try {
                 var data     = new String();

@@ -28,32 +28,29 @@ tools@securitycompass.com
  */
 
 /**
- * \class AttackRunner
+ * @class AttackRunner
  */
 function AttackRunner(){
 
     this.className = "AttackRunner";
+    /**
+     * uniqueID is important for heuristic tests which need a random string in
+     * order to find the char they sent
+     */
+    this.uniqueID = Math.floor(Date.now() * Math.random());
     
 }
 
 AttackRunner.prototype = {
     testData: null
     ,
-    submitForm: function(tab, formIndex){
-        dump('going to submit form in tab: ' + tab.nodeName + '\n');
-        dump('the forms are: ' + tab.linkedBrowser.contentDocument.forms + 
-                ' ' + tab.linkedBrowser.contentDocument.forms  + '\n');
-        dump('dorons question: ' + 
-                tab.linkedBrowser.contentDocument.getElementsByTagName('form').
-                length + '\n');
-        dump('tab.linkedBrowser.contentDocument.location.href == ' + 
-                tab.linkedBrowser.contentDocument.location.href +
-                '\n');
-        var forms = tab.linkedBrowser.contentDocument.forms;
+    submitForm: function(browser, formIndex){
+        var forms = browser.webNavigation.document.forms;
         var formFound = false;
         for (var i = 0; i < forms.length && !formFound; i++){
             if (i == formIndex){
                 dump('submitting form ... ' + i + ' ' + (i == formIndex) + '\n');
+                if (forms[i].target) forms[i].target = null;
                 forms[i].submit();
                 formFound = true;
             }
@@ -65,76 +62,113 @@ AttackRunner.prototype = {
         return formFound;
     }
     ,
-    do_test: function(formPanel, formIndex, field, testValue, resultsManager){
+    do_test: function(formPanel, formIndex, field, testValue, resultsManager,
+            tabIndex)
+    {
         var mainBrowser = getMainWindow().getBrowser();
         var currentTab = mainBrowser.selectedTab;
-        var workTab = null;
         var wroteTabData = false;
         var tabManager = new TabManager();
         var self = this; //make sure we always have a reference to this object
-        
+        var browser = mainBrowser.getBrowserAtIndex(tabIndex);
+             
         this.testValue = testValue;
         this.formIndex = formIndex;
         this.fieldIndex = field.index;
-        
-        dump('do_test::curentTab:' + currentTab + '\n');
+        this.field = field;
+        browser.webNavigation.stop(Components.interfaces.nsIWebNavigation.STOP_ALL);
+
         tabManager.readTabData(currentTab);
-        dump('do_test... tabManager: ' + tabManager + '\n');
-        workTab = mainBrowser.addTab('about:blank');
-        workTab.linkedBrowser.webNavigation.stop(STOP_ALL);
-        mainBrowser.selectedTab = currentTab; //make sure that the stab stays.
+        setTimeout(function() {afterWorkTabStopped()}, 10);
         
-        setTimeout(afterWorkTabStopped, 10);
-            
-        function afterWorkTabStopped(event){
-            dump('start afterWorkTabStopped\n');
-            
-            workTab.linkedBrowser.addEventListener('pageshow', 
-                    afterWorkTabHasLoaded, false);            
+        function afterWorkTabStopped(){
+            browser.addEventListener('pageshow',
+                    afterWorkTabHasLoaded, false);
             
             //this also moves worktab to the same page as the currentTab
-            tabManager.writeTabHistory(workTab.linkedBrowser.webNavigation);
+            var count = currentTab.linkedBrowser.sessionHistory.count;
+            if (count) {
+                var currentEntry = currentTab.linkedBrowser.sessionHistory.getEntryAtIndex((count-1), false);
+                var postData = null;
+                if (currentEntry.postData) {
+                    var postDataStream = Components.classes["@mozilla.org/scriptableinputstream;1"].
+                            createInstance(Components.interfaces.nsIScriptableInputStream);
+                    
+                    postDataStream.init(currentEntry.postData);
+                    
+                    while (true) {
+                        var foo = postDataStream.read(512);
+                        if (foo) {
+                            postData += foo;
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                }
+                
+                browser.webNavigation.loadURI(currentEntry.URI.spec, 0, (currentEntry.referrerURI?currentEntry.referrerURI:null), postData, null); 
+            }
+            else {
+                browser.webNavigation.loadURI(currentTab.linkedBrowser.webNavigation.currentURI.spec, 0, null, null, null);
+            }
             
-            dump('end afterWorkTabStopped\n');
         }
         
         function afterWorkTabHasLoaded(event) {
             dump('start afterWorkTabHasLoaded\n');
             var formData = null;
-            workTab.linkedBrowser.removeEventListener('pageshow', 
+            browser.removeEventListener('pageshow', 
                     afterWorkTabHasLoaded, false);
             
+            var loadSuccessful = compareContentDocuments(currentTab.linkedBrowser.contentDocument, browser.contentDocument)
+            
+            if (loadSuccessful === false) {
+                getTestManager().cannotRunTests();
+                return
+            }
+
             //this will copy all the form data...
-            if (field){
-                tabManager.writeTabForms(workTab.linkedBrowser.contentDocument.
-                        forms,  formIndex, field.index, testValue);
-                formData = tabManager.getFormDataForURL(workTab.linkedBrowser.
-                        contentDocument.forms,  formIndex, field.index, 
-                        testValue);
+            try { 
+                if (field)
+                {
+                    tabManager.writeTabForms(browser.contentDocument.
+                            forms,  formIndex, field.index, testValue);
+                    formData = tabManager.getFormDataForURL(browser.
+                            contentDocument.forms,  formIndex, field.index, 
+                            testValue);
+                }
+                else 
+                {
+                    tabManager.writeTabForms(browser.contentDocument.
+                            forms,  formIndex, null, null);
+                    formData = tabManager.getFormDataForURL(browser.
+                            contentDocument.forms,  formIndex, null, null);
+                }
             }
-            else {
-                tabManager.writeTabForms(workTab.linkedBrowser.contentDocument.
-                        forms,  formIndex, null, null);
-                formData = tabManager.getFormDataForURL(workTab.linkedBrowser.
-                        contentDocument.forms,  formIndex, null, null);
+            catch(e) {
+                Components.utils.reportError(e + " " + (browser.webNavigation.currentURI?browser.webNavigation.currentURI.spec:"null"))
             }
-            self.testData = tabManager.getTabData(workTab.linkedBrowser.
+            dump('AttackRunner::afterWorkTabHasLoaded  testValue===' + testValue + '\n');
+
+
+            self.testData = tabManager.getTabData(browser.
                     contentDocument.forms,  formIndex, field.index);
             dump('attackRunner::testData == ' + this.testData + '\n');
             dump('tab data should be written now\n');
             
             if (window.navigator.platform.match("win", "i")) {
-                workTab.linkedBrowser.addEventListener('pageshow', 
+                browser.addEventListener('pageshow', 
                         afterWorkTabHasSubmittedAndLoaded, false);
             }
             else {
-                setTimeout(function(){workTab.linkedBrowser.addEventListener('pageshow', 
+                setTimeout(function(){browser.addEventListener('pageshow', 
                         afterWorkTabHasSubmittedAndLoaded, false)}, 1);
             }
                     
             if (resultsManager)
             {
-                workTab.linkedBrowser.addEventListener('pageshow', 
+                browser.addEventListener('pageshow', 
                         afterWorkTabHasSubmittedAndLoaded, false); 
                            
                 var observerService = Components.
@@ -150,7 +184,7 @@ AttackRunner.prototype = {
                 
             }
             var formGotSubmitted = self.submitForm(
-                    workTab, formIndex);
+                    browser, formIndex);
             dump('end afterWorkTabHasLoaded '+ formGotSubmitted +'\n');
      
         }
@@ -158,11 +192,25 @@ AttackRunner.prototype = {
         //this should fire only *after* the form has been sumbitted and the new
         //page has loaded.
         function afterWorkTabHasSubmittedAndLoaded(event){
-            var results = resultsManager.evaluate(workTab.linkedBrowser, self);
-            for each (result in results){
-                tabManager.addFieldData(result);
+            
+            if (currentTab.linkedBrowser.webNavigation.currentURI.spec !== event.currentTarget.webNavigation.currentURI.spec  ) {
+                browser.removeEventListener('pageshow', afterWorkTabHasSubmittedAndLoaded, false);
+                //var foo = "event = {";
+                //for (var key in event) {
+                //    foo += key + "=>" + event[key] + ";"
+                //} 
+                //foo += "}"
+                
+                var results = resultsManager.evaluate(event.currentTarget, self);
+                for each (result in results){
+                    tabManager.addFieldData(result);
+                }
+                getTestRunnerContainer().freeTab(tabIndex);
+                
             }
-            mainBrowser.removeTab(workTab);
+            else {
+
+            }
         }
         
     }

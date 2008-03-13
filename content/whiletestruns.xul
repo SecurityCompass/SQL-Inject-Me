@@ -2,7 +2,7 @@
 <!DOCTYPE dialog PUBLIC "-//MOZILLA//DTD XUL V1.0//EN" "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 <?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
-
+<?xml-stylesheet href="chrome://sqlime/skin/whiletestruns.css" type="text/css"?>
 <dialog id="dialog-name"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
@@ -10,8 +10,12 @@
         persist="screenX screenY"
         buttons="accept"
         ondialogaccept="return OK();"
-        ondialogcancel="return OK();">
-    <!-- 
+        ondialogcancel="return OK();"
+        onload="onLoad();"
+        onunload="onUnLoad()"
+        flex="1"
+        >
+<!--
 Copyright 2007 Security Compass
 
 This file is part of SQL Inject Me.
@@ -34,6 +38,18 @@ tools@securitycompass.com
 -->
     <script type="application/x-javascript;version=1.7"
         src="chrome://sqlime/content/whiletestruns.js" />
-    <description>Your tests are running. This will probably take a while.<xhtml:br />Please don't change tabs (that tab and it's state is being used as the basis for all tests) but you can use other windows.<xhtml:br />This window automatically close when the tests are done.</description>
-    <progressmeter mode="undetermined" />
+    <vbox flex="1">
+        <vbox flex="1" id='heuristicTestingBox'>
+            <label value='Probing for XSS Vulnerabilities: ' />
+            <description><xhtml:span id='heuristicTestCount'></xhtml:span> Tests Run
+            </description>
+            <progressmeter id='heuristicBar' mode='determined'/>
+        </vbox>
+        <vbox flex="1">
+            <label value='Testing with XSS Strings:' />
+            <description><xhtml:span id='thoroughTestCount'>0/TBD</xhtml:span> Tests Run
+            </description>
+            <progressmeter id='thoroughBar' mode="determined" />
+        </vbox>
+    </vbox>
 </dialog>

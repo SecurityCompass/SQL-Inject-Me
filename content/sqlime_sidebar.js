@@ -34,6 +34,18 @@ const TestType_OneTestForForm = 3;
 const TestType_AllTestsForAllForms = 4;
 
 const STOP_ALL = Components.interfaces.nsIWebNavigation.STOP_ALL;
+
+const __sqli_me_prefs_to_disable = [
+        {"name": "security.warn_entering_secure", "type":"bool", "ourValue": false},
+        {"name": "security.warn_entering_weak", "type":"bool", "ourValue": false},
+        {"name": "security.warn_leaving_secure", "type":"bool", "ourValue": false},
+        {"name": "security.warn_submit_insecure", "type":"bool", "ourValue": false},
+        {"name": "security.warn_viewing_mixed", "type":"bool", "ourValue": false},
+        {"name": "dom.max_chrome_script_run_time", "type":"int", "ourValue": 0},
+        {"name": "signon.prefillForms", "type":"bool", "ourValue":false},
+        {"name": "signon.rememberSignons", "type":"bool", "ourValue":false},
+        {"name": "accessibility.typeaheadfind.enablesound", "type":"bool", "ourValue":false}
+        ];
  
 /**
  * get a reference to the main firefox window
@@ -62,37 +74,56 @@ function extension(){
     //do nothing right now...
     this.plistener = null;
     this.warningDialog = null;
-    this.typeAheadSound = true; //default for 
+    this.typeAheadSound = true; //default for
+    this.prefs = new Array();
 }
 
 extension.prototype = {
-    getTestType: function(){
+    getTestType: function(event){
         var tabbox = document.getElementById('sidebarformtabbox');
-        // id="type" is not document unique, but it is unique in a panel.
-        var typeOfTest = tabbox.selectedPanel.
-                getElementsByAttribute('class', 'TestType').item(0).
-                selectedItem.value;
-        dump('getting the type of test: ' + typeOfTest + '\n');
-        var rv = -1;
-        var testTypeInfo = new Object();
-        testTypeInfo.type = typeOfTest;
-        if (typeOfTest == TestType_AllTestsForForm) {
-            testTypeInfo.count = getAttackStringContainer().getStrings().length;
-        }
-        else if (typeOfTest == TestType_PrefNumTestsForForm) {
-            var numAttacks = getAttackStringContainer().getStrings().length;
-            var preferedNumAttacks = this.getPreferredNumberOfAttacks();
-            
-            testTypeInfo.count = (preferedNumAttacks > numAttacks) ? numAttacks : preferedNumAttacks;
-        }
-        else if (typeOfTest == TestType_OneTestForForm) { 
-            testTypeInfo.count = 1;
-        }
-        return testTypeInfo;
+        var rv = new Object();
+        var buttonClicked = event.explicitOriginalTarget;
         
+        if (buttonClicked.className && buttonClicked.className ===
+            'run_form_test')
+        {
+            
+            rv.singleFormTest = true;
+
+            if ( tabbox.selectedPanel.
+                getElementsByAttribute('class', 'TestType').item(0).
+                selectedItem.value == TestType_AllTestsForForm)
+            {
+                rv.allTests = true;
+            }
+            else {
+                rv.allTests = false;
+            }
+            
+        }
+        else {
+            rv.singleFormTest = false;
+            if (buttonClicked.id === 'test_all_forms_with_all_attacks'){
+                rv.allTests=true;
+            }
+            else {
+                rv.allTests = false;
+            }
+        }
+        
+        /* cache the number of attacks early */
+        rv.count = getAttackStringContainer().getStrings().length;
+        if (rv.allTests === false) {
+            var prefNumAttacks = this.getPreferredNumberOfAttacks();
+            
+            rv.count = (prefNumAttacks > rv.count) ? rv.count : prefNumAttacks;
+            
+        }
+        
+        return rv;
     }
     ,
-    getFieldsToTest:function(formPanel, all) {
+    getMarkedFieldsForPanel:function(formPanel, all, formIndex) {
         var fieldUIs = formPanel.getElementsByAttribute('class', 'nolabel');
         var fieldsToTest = new Array();
         
@@ -100,159 +131,84 @@ extension.prototype = {
             if (fieldUIs[i].checked || all === true){
                 var fieldToTest = new Object();
                 fieldToTest.index = parseInt(fieldUIs[i].getAttribute('formElementIndex'));
+                fieldToTest.name = getMainHTMLDoc().forms[formIndex].elements[fieldToTest.index].name;
                 fieldsToTest.push(fieldToTest);
             }
         }
         return fieldsToTest;
     }
     ,
+    /**
+     * iterate through all these fields and find all the marked ones
+     * @param testType the type of test that is being run.
+     * @returns a list of fields to test
+     */
+    getFieldsToTest: function(testType) {
+        var rv = null;
+        var tabbox = document.getElementById('sidebarformtabbox');
+        if (testType.singleFormTest) {
+            rv = this.getMarkedFieldsForPanel(tabbox.selectedPanel, false, tabbox.selectedIndex);
+            for each (field in rv) {
+                field.formIndex = tabbox.selectedIndex;
+                field.formName = getMainHTMLDoc().forms[tabbox.selectedIndex].name;
+            }
+        }
+        else {
+            /* @todo is using ._tabpanels safe here? ._tabpanels is a
+               cached version of the panels */
+            for (var n = 0; n < tabbox._tabpanels.childNodes.length; n++) {
+                /* @todo is using ._tabpanels safe here? ._tabpanels is a
+                   cached version of the panels */
+                var temp = this.getMarkedFieldsForPanel(tabbox._tabpanels.
+                        childNodes.item(n), true, n);
+                for each (field in temp) {
+                    field.formIndex = n;
+                    field.formName = getMainHTMLDoc().forms[n].name;
+                    
+                }
+                if (rv) {
+                    rv = rv.concat(temp);
+                }
+                else {
+                    rv = temp;
+                }
+            }
+        }
+        return rv;
+    }
+    ,
     run_tests: function(event){
         
         var canRunTests = this.preTest();
         
-        if (canRunTests == false) {
-            alert('Could not run tests because tests are already running.');
-            return ;
+        if (canRunTests == false){
+            alert('Could not run tests as test are already running. Please ' +
+                  'wait for these tests to finish.')
+            return;
         }
         
-        var buttonClicked = event.explicitOriginalTarget;
-        dump('have button (' + buttonClicked + ') with className ' + 
-                buttonClicked.className + ' and id ' + buttonClicked.id + '\n');
+        var testType = this.getTestType(event);
+        var fieldsToTest = this.getFieldsToTest(testType);
         
-        var resultsManager = new ResultsManager(this);
-        resultsManager.addEvaluator(checkForErrorString);
+        if (fieldsToTest.length === 0) {
+            alert('Please make sure you have selected fields to test.')
+            this.postTest();
+            return;
+        }
+        else {
+            testCount = fieldsToTest.length * testType.count;
+            // SQL Inject Me has only one type of test (though 2 results are
+            // yielded)
+        }
         
-        if (buttonClicked.className && buttonClicked.className === 'run_form_test'){
-            var testType = this.getTestType();
-            var formPanel = document.getElementById('sidebarformtabbox').
-                    selectedPanel;
-            var formIndex = document.getElementById('sidebarformtabbox').
-                    selectedIndex;
-            var fieldsToTest = this.getFieldsToTest(formPanel);
-            
-            dump('going to test ' + testType.count + ' fields of ' + 
-                    fieldsToTest + '\n');
-            if (testType.type == TestType_AllTestsForForm || 
-                testType.type == TestType_PrefNumTestsForForm)
-            
-            {
-                if (testType.count > 0){
-                    for each (var field in fieldsToTest) {
-                        for (var testIndex = 0; 
-                             testIndex < testType.count; 
-                             testIndex++)
-                        {
-                            
-                            var testValue = getAttackStringContainer().
-                                    getStrings()[testIndex];
-                            var testRunner = new AttackRunner();
-                            
-                            
-                            dump('running test on field ' + field.index + 
-                                    ' with value ' + testValue + '\n');
-                            
-                            resultsManager.registerAttack(testRunner);
-                            
-                            getTestRunnerContainer().addTestRunner(testRunner,
-                                    formPanel, formIndex, field, testValue, 
-                                    resultsManager);
-                            
-                        }
-                    }
-                    resultsManager.showResults();
-                }
-            }
-        }
-        else if (buttonClicked.id === 'test_all_forms_with_all_attacks') {
-                var tabbox = document.getElementById('sidebarformtabbox');
-                var htmlDoc = getMainHTMLDoc();
-                var numberOfForms = htmlDoc.forms.length;
-                var numberOfTests = getAttackStringContainer().getStrings().
-                        length;
-                
-                for (var formIndex = 0; formIndex < numberOfForms; formIndex++){
-                    tabbox.selectedIndex = formIndex;
-                                        
-                    dump('test_all_forms_with_all_attacks: going to test ' + numberOfTests + '\n');
-                    var fieldsToTest = this.getFieldsToTest(tabbox.selectedPanel, true);
-                    
-                    for each(var field in fieldsToTest)
-                    {
-                        
-                        for (var testIndex = 0; 
-                            testIndex < numberOfTests; 
-                            testIndex++)
-                        {
-                            
-                            var testValue = getAttackStringContainer().
-                                    getStrings()[testIndex];
-                            var testRunner = new AttackRunner();
-                            
-                            dump('running test on field ' + field.index 
-                                    + ' with value ' + testValue + '\n');
-                            
-                            resultsManager.registerAttack(testRunner);
-                            
-                            getTestRunnerContainer().addTestRunner(testRunner,
-                                    tabbox.selectedPanel, formIndex, field, testValue, 
-                                    resultsManager);
-                            
-                        }
-                    }
-                    
-                }
-                
-                resultsManager.showResults();
-                
-        }
-        else if (buttonClicked.id === 'test_all_forms_with_top_attacks') {
-                var tabbox = document.getElementById('sidebarformtabbox');
-                var htmlDoc = getMainHTMLDoc();
-                var numberOfForms = htmlDoc.forms.length;
-                var numberOfTests = this.getPreferredNumberOfAttacks();
-                
-                for (var formIndex = 0; formIndex < numberOfForms; formIndex++){
-                    tabbox.selectedIndex = formIndex;
-//                     var fieldsToTest = this.getFieldsToTest(tabbox.selectedPanel);
-                    
-                    dump('test_all_forms_with_top_attacks: going to test ' + numberOfTests + '\n');
-//                     dump('fields of ' + typeof(fieldsToTest)+ '\'\n');
-                    dump('test_all_forms_with_top_attacks: htmlDoc.forms[formIndex].elements.length = ' + htmlDoc.forms[formIndex].elements.length + '\n');
-                    var fieldsToTest = this.getFieldsToTest(
-                            tabbox.selectedPanel, true);
-                    for each (var field in fieldsToTest) {
-                        
-                        dump('test_all_forms_with_top_attacks: numberOfTests == ' + numberOfTests + '\n');
-                        
-                        for (var testIndex = 0; 
-                        testIndex < numberOfTests; 
-                        testIndex++)
-                        {
-                            
-                            var testValue = getAttackStringContainer().
-                                    getStrings()[testIndex];
-                            var testRunner = new AttackRunner();
-                            
-                            dump('running test on field ' + field.index + ' with value ' + testValue + '\n');
-                            
-                            resultsManager.registerAttack(testRunner);
-                            
-                            getTestRunnerContainer().addTestRunner(testRunner,
-                                    formPanel, formIndex, field, testValue, 
-                                    resultsManager);
-
-                        }
-                    }
-                    
-                }
-                
-                resultsManager.showResults();
-
-        }
-        dump('do we have results?' + resultsManager.hasResults()+'\n');
-//         if (resultsManager.hasResults()){
-//             resultsManager.showResults();
-//         }
+        this.warningDialog = window.openDialog(
+                'chrome://sqlime/content/whiletestruns.xul', 'whiletestruns',
+                'chrome,dialog,dependant=yes', testCount, testType);
+        
+        var testManager = getTestManager(this);
+        
+        testManager.runTest(testType, fieldsToTest);
+        
     }
     ,
     createActionUI: function() {
@@ -335,12 +291,14 @@ extension.prototype = {
         
         tabbox.setAttribute('id', 'sidebarformtabbox');
         //we only want to put things in a clean box.
-        if (box.childNodes.length !== 0){
-            for (var i = 0; i < box.childNodes.length; i++){
+        if (box.childNodes.length !== 0) {
+            for (var i = 0; i < box.childNodes.length; i++) {
                 box.removeChild(box.childNodes[i]);
             }
         }
         
+        getSidebarBuilder().add(box, tabbox);
+
         // create the form UI
         // Note that the addition of the DOM is seperated from the creation of 
         // it in the hopes that it will make for a faster overall operation 
@@ -408,12 +366,8 @@ extension.prototype = {
                         }
                         sidebarElement = sidebarElement.getElementsByAttribute('editable', 'true')[0];
                         this.syncSidebarToForm(sidebarElement, aForm.elements[n]);
-                        
-
                     }
                     
-                     
-                            
                 }
                 
                 var actionButtons = this.createActionUI();
@@ -427,28 +381,43 @@ extension.prototype = {
             
             //Add the form UI to the DOM.
             for (var i =0; i < newTabs.length; i++) {
-                newTabPanelVbox[i].appendChild(fieldsLabel.cloneNode(true));
+                //newTabPanelVbox[i].appendChild(fieldsLabel.cloneNode(true));
                 for each(var fieldUI in newTabForms[i]) {
-                    dump(q++ + 'appending ui :' + fieldUI + '\n');
-                    newTabPanelVbox[i].appendChild(fieldUI);
+                    //dump(q++ + 'appending ui :' + fieldUI + '\n');
+                    //newTabPanelVbox[i].appendChild(fieldUI);
+                    getSidebarBuilder().add(newTabPanelVbox[i], fieldUI);
                 }
                 
                 for each(var mi in newTabActions[i].menuitems){
-                    newTabActions[i].menupopup.appendChild(mi);
+                    //newTabActions[i].menupopup.appendChild(mi);
+                    getSidebarBuilder().add(newTabActions[i].menupopup, mi);
                 }
-                newTabActions[i].menulist.appendChild(newTabActions[i].
-                        menupopup);
+                //newTabActions[i].menulist.appendChild(newTabActions[i].
+                //        menupopup);
+                getSidebarBuilder().add(newTabActions[i].menulist,
+                        newTabActions[i].menupopup);
                 
-                newTabActions[i].box.appendChild(newTabActions[i].menulist);
-                newTabActions[i].box.appendChild(newTabActions[i].button);
-                newTabPanelVbox[i].appendChild(newTabActions[i].box);
-                newTabPanels[i].appendChild(newTabPanelVbox[i]);
-                tabs.appendChild(newTabs[i]);
-                tabpanels.appendChild(newTabPanels[i]);
+                //newTabActions[i].box.appendChild(newTabActions[i].menulist);
+                getSidebarBuilder().add(newTabActions[i].box,
+                        newTabActions[i].menulist);
+                //newTabActions[i].box.appendChild(newTabActions[i].button);
+                getSidebarBuilder().add(newTabActions[i].box,
+                        newTabActions[i].button);
+                //newTabPanelVbox[i].appendChild(newTabActions[i].box);
+                getSidebarBuilder().add(newTabPanelVbox[i],
+                        newTabActions[i].box);
+                //newTabPanels[i].appendChild(newTabPanelVbox[i]);
+                getSidebarBuilder().add(newTabPanels[i], newTabPanelVbox[i]);
+                //tabs.appendChild(newTabs[i]);
+                getSidebarBuilder().add(tabs, newTabs[i]);
+                //tabpanels.appendChild(newTabPanels[i]);
+                getSidebarBuilder().add(tabpanels, newTabPanels[i]);
             }
             
-            tabbox.appendChild(tabs);
-            tabbox.appendChild(tabpanels);
+            //tabbox.appendChild(tabs);
+            getSidebarBuilder().add(tabbox, tabs);
+            //tabbox.appendChild(tabpanels);
+            getSidebarBuilder().add(tabbox, tabpanels, ensureFirstTabPanelIsSelected);
             
         }
         else {
@@ -462,22 +431,28 @@ extension.prototype = {
             
             noformTab.setAttribute("label", "No Forms");
             
-            noformPanelVbox.appendChild(labelinpanel);
+            //tabbox.appendChild(tabs);
+            getSidebarBuilder().add(tabbox, tabs);
+            //tabbox.appendChild(tabpanels);
+            getSidebarBuilder().add(tabbox, tabpanels);
             
-            noformPanel.appendChild(noformPanelVbox);
+            //tabs.appendChild(noformTab);
+            getSidebarBuilder().add(tabs, noformTab);
             
-            tabs.appendChild(noformTab);
+            //tabpanels.appendChild(noformPanel);
+            getSidebarBuilder().add(tabpanels, noformPanel);
             
-            tabpanels.appendChild(noformPanel);
+            //noformPanel.appendChild(noformPanelVbox);
+            getSidebarBuilder().add(noformPanel, noformPanelVbox);
             
-            tabbox.appendChild(tabs);
-            tabbox.appendChild(tabpanels);
+            //noformPanelVbox.appendChild(labelinpanel);
+            getSidebarBuilder().add(noformPanelVbox, labelinpanel);
             
         }
         
-        tabbox.setAttribute('flex', 1);
         
-        box.appendChild(tabbox);
+        
+        getSidebarBuilder().start();
         
     }
     ,
@@ -497,6 +472,19 @@ extension.prototype = {
                 addProgressListener(this.plistener,
                 Components.interfaces.nsIWebProgress.NOTIFY_STATE_DOCUMENT);
         
+        this.sidebarBuilderPauseObserver = new Xss_PrefObserver(watchSidebarBuilderPausePref);
+        
+        var prefService = Components.classes['@mozilla.org/preferences-service;1'].
+                getService(Components.interfaces.nsIPrefService);
+        
+        var branch = prefService.getBranch('');
+        
+        var observableBranch = branch.
+                QueryInterface(Components.interfaces.nsIPrefBranch2);
+                
+        observableBranch.addObserver('extensions.sqlime.sidebarbuildingstop',
+                                     this.sidebarBuilderPauseObserver, false);
+        
     }
     ,
     removeAllMainWindowEventListeners: function (){
@@ -505,8 +493,23 @@ extension.prototype = {
         mainWindow.document.getElementById('content').
                 removeProgressListener(this.plistener);
                 
-        mainWindow.removeEventListener('TabSelect', this.windowEventClosure, false);
-        this.windowEventClosure = null;
+        if (this.windowEventListenerClosure) {
+            mainWindow.getBrowser().tabContainer.
+                    removeEventListener('TabSelect',
+                            this.windowEventListenerClosure,
+                            false);
+            this.windowEventListenerClosure = null;
+        }
+        var prefService = Components.classes['@mozilla.org/preferences-service;1'].
+                getService(Components.interfaces.nsIPrefService);
+        
+        var branch = prefService.getBranch('');
+        
+        var observableBranch = branch.
+                QueryInterface(Components.interfaces.nsIPrefBranch2);
+                
+        observableBranch.removeObserver('extensions.sqlime.sidebarbuildingstop',
+                this.sidebarBuilderPauseObserver)
         
     }
     ,
@@ -518,48 +521,55 @@ extension.prototype = {
     }
     ,
     /**
-     * This function holds code that is general for any time we want to do a
-     * test
+     * This function does two things:
+     * 1. Checks if we can run a test
+     * 2. Preps the browser for testing (changing prefs, etc.)
+     * @returns true if we can test, false otherwise.
      */
     preTest: function() {
         var rv = false;
         if (this.warningDialog === null){
             rv = true;
-            var testRunnerContainer = getTestRunnerContainer(getMainWindow().
-                    document.getElementById('content').mTabs.length);
-            
-            if (testRunnerContainer.keepChecking === false){
-                testRunnerContainer.keepChecking = true;
-                testRunnerContainer.start(); // if keepChecking is true than we
-                                             // it's already started
-            }
-            
-            this.warningDialog = window.openDialog(
-                    'chrome://sqlime/content/whiletestruns.xul',
-                    'whiletestruns',
-                    'chrome,dialog,dependant=yes');
             
             var prefService = Components.
                     classes['@mozilla.org/preferences-service;1'].
                     getService(Components.interfaces.nsIPrefService);
-
-            var branch = prefService.getBranch('dom.');
-            if (branch.prefHasUserValue('max_chrome_script_run_time')) {
-                this.originalMaxChromeScriptRunTime = branch.
-                        getIntPref('max_chrome_script_run_time');
+            var branch = prefService.getBranch("");
+            for each (var prefInfo in __sqli_me_prefs_to_disable) {                
+                var origValue;
+                var errorState = false;
+                switch(prefInfo.type){
+                    case 'bool':
+                        try {
+                            origValue = branch.getBoolPref(prefInfo.name);
+                            branch.setBoolPref(prefInfo.name, prefInfo.ourValue);
+                        }
+                        catch(e){
+                            Components.utils.reportError(e +' with '+ prefInfo.name);
+                            errorState = true;
+                        }
+                        break;
+                    case 'int':
+                        try {
+                            origValue = branch.getIntPref(prefInfo.name);
+                            branch.setIntPref(prefInfo.name, prefInfo.ourValue);
+                        }
+                        catch(e){
+                            Components.utils.reportError(e + ' with '+ prefInfo.name);
+                            errorState = true
+                        }
+                        break;
+                }
+                
+                if (errorState) break;
+                
+                var backupPref = {
+                        'name': prefInfo.name,
+                        'type': prefInfo.type,
+                        'origValue': origValue};
+                
+                this.prefs.push(backupPref);
             }
-            else {
-                this.originalMaxChromeScriptRunTime = null
-            }
-                    
-            branch.setIntPref('max_chrome_script_run_time', 0);
-            //disables the "script ran too long alert
-            
-            branch = prefService.getBranch('accessibility.typeaheadfind.');
-            if (branch.prefHasUserValue('enablesound')) {
-                this.typeAheadSound = branch.getBoolPref('enablesound');
-            }
-            branch.setBoolPref('enablesound', false);
             
         }
         return rv;
@@ -572,20 +582,65 @@ extension.prototype = {
         var prefService = Components.
                     classes['@mozilla.org/preferences-service;1'].
                     getService(Components.interfaces.nsIPrefService);
+        var branch = prefService.getBranch("");
+        for each(var backupPref in this.prefs) {
+                switch(backupPref.type){
+                    case 'bool':
+                        try {
+                            branch.setBoolPref(backupPref.name, backupPref.origValue);
+                        }
+                        catch(e){
+                            Components.utils.reportError(e +'with '+ backupPref.name);
+                        }
+                        break;
+                    case 'int':
+                        try {
+                            branch.setIntPref(backupPref.name, backupPref.origValue);
+                        }
+                        catch(e){
+                            Components.utils.reportError(e + 'with '+ backupPref.name);
+                        }
+                        break;
+                }
+        }
+        
+        this.prefs.splice(0, this.prefs.length);
+    }
+    ,
+    calculateWorseCaseNumTestsToRun: function(testType, fieldsToTest) {
+        
+        var rv = 0;
+        
+        var numFieldsToTest = fieldsToTest.length;
+        
+        if (testType.heuristicTest) {
             
-        var branch = prefService.getBranch('dom.');
-        if (this.originalMaxChromeScriptRunTime !== null) {
-            branch.setIntPref('max_chrome_script_run_time', this.
-                    originalMaxChromeScriptRunTime);
+            var numTestChars = this.getHeuristicTestChars().length;
+            
+            rv += numFieldsToTest * numTestChars;
+            
         }
-        else {
-            branch.clearUserPref('max_chrom_script_run_time');
-        }
-        branch = prefService.getBranch('accessibility.typeaheadfind.');
-        branch.setBoolPref('enablesound', this.typeAheadSound);
+        
+        rv += numFieldsToTest*testType.count*2; // *2 because there are both DOM and string tests to run
+        Components.utils.reportError("worse case num tests = ("+numFieldsToTest+"*" +numTestChars+"+"+numFieldsToTest+ "*"+ testType.count+") = "+
+                "("+ (numFieldsToTest*numTestChars) +"+"+ (numFieldsToTest*testType.count)+") = " +((numFieldsToTest*numTestChars) + (numFieldsToTest*testType.count))+ " = " + rv);
+        return rv;
         
     }
- }
+    ,
+    /**
+     * Called by the testmanager and resultsmanager to report that a test has
+     * been completed so that the popup's UI can be updated
+     */
+    finishedTest: function() {
+        if (this.warningDialog.closed === false && typeof(this.warningDialog.finishedTest) == 'function') {
+            this.warningDialog.finishedTest();
+        }
+        else if (typeof(this.warningDialog.finishedTest) != 'function') {
+            Components.utils.reportError('warning dialog\'s finished test function is missing.');
+        }
+    }
+}
 
  
 /**
@@ -705,4 +760,25 @@ function isFormField(node){
         default:
                 return false;
     }
+}
+
+/**
+ * Watches the sidebar builder pause time preference and sets 
+ */
+function watchSidebarBuilderPausePref(subject, topic, data) {
+    var prefService = Components.classes['@mozilla.org/preferences-service;1'].
+            getService(Components.interfaces.nsIPrefService);
+    var branch = prefService.getBranch('extensions.sqlime.');
+    
+    getSidebarBuilder().time = branch.getIntPref('sidebarbuildingstop');
+}
+
+/**
+ * This function is used to make sure that the first tab panel is selected
+ * in a tabbox
+ * @param parent the tabbox
+ * @param child the tabpanels element
+ */
+function ensureFirstTabPanelIsSelected(parent, child) {
+   parent.selectedIndex= parent._tabpanels.selectedIndex = 0;
 }

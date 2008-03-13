@@ -27,15 +27,32 @@ If you have any questions regarding SQL Inject Me please contact
 tools@securitycompass.com
 -->
         <preferences>
-            <preference id="preferedNumAttacks" name="extensions.sqlime.prefnumattacks" type="int"/>
-            <preference id="showContextMenu" name="extensions.sqlime.showcontextmenu" type="bool" instantApply='true'/>
-            <preference id="numtabstouse" name="extensions.sqlime.numtabstouse" type="int"/>
+            <preference id="preferedNumAttacks"
+                        name="extensions.sqlime.prefnumattacks"
+                        type="int"/>
+            <preference id="showContextMenu"
+                        name="extensions.sqlime.showcontextmenu"
+                        type="bool"
+                        instantApply='true'/>
+            <preference id="numtabstouse"
+                        name="extensions.sqlime.numtabstouse"
+                        type="int"/>
+            <preference id="prefSidebarBuildingPause"
+						name="extensions.sqlime.sidebarbuildingstop"
+						type="int" />
         </preferences>
         <checkbox label="Show Context Menu" preference="showContextMenu" />
         <label value="Prefered Number of Attacks to Test" control="preferedNumAttacksTxtBox" />
         <textbox id="preferedNumAttacksTxtBox" preference="preferedNumAttacks" />
         <label value="Number of tabs to use for testing" control="preferednumtabs" />
         <textbox id="preferednumtabs" preference="numtabstouse" />
+        <label value="Pause between adding items to sidebar (in ms)."
+               tooltip='tipSidebarBuildingPause'
+			   control="txtSidebarBuildingPause"
+               crop="end" />
+		<textbox id="txtSidebarBuildingPause"
+                 preference="prefSidebarBuildingPause"
+                 tooltip='tipSidebarBuildingPause' />
     </prefpane>
     <prefpane label="SQL Injection Strings" id="sqlistrings">
         <preferences>

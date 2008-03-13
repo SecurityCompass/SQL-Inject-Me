@@ -29,8 +29,16 @@ tools@securitycompass.com
 -->
     <script type="application/x-javascript;version=1.7" 
             src="chrome://global/content/findUtils.js" />
+    <script type="application/x-javascript" 
+            src="chrome://sqlime/content/io.js" />
     <script type="application/x-javascript;version=1.7" 
             src="chrome://sqlime/content/util.js" />
+    <script type="application/x-javascript"
+            src="chrome://sqlime/content/sidebarBuilder.js" />
+    <script type="application/x-javascript"
+            src="chrome://sqlime/content/PrefObserver.js" />
+	<script type="application/x-javascript"
+            src="chrome://sqlime/content/TestManager.js" />
     <script type="application/x-javascript;version=1.7" 
             src="chrome://sqlime/content/TestRunnerContainer.js" />
     <script type="application/x-javascript;version=1.7" 
@@ -90,7 +98,7 @@ tools@securitycompass.com
         sqlimeExtension.addAllMainWindowEventListeners();
         document.getElementById('sqlime_generate_form_ui').doCommand();}, 
                 true);
-            
+        
         window.addEventListener("unload", 
             function() { sqlimeExtension.removeAllMainWindowEventListeners()}, 
                 true); // This should limit leaks

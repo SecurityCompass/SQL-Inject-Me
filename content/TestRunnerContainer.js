@@ -25,7 +25,7 @@ tools@securitycompass.com
  */
 
 /**
- * Based around a poor man's semphore concept.
+ * Based around a poor man's semaphore concept.
  */
 function TestRunnerContainer(currentNumTabs){
     this.testRunners = new Array(); //All these arrays are parallell
@@ -35,6 +35,10 @@ function TestRunnerContainer(currentNumTabs){
     this.testValues = new Array();
     this.resultsManagers = new Array();
     this.baseNumTabs = currentNumTabs;
+    this.testManager = null;
+    this.keepChecking = true;
+    this.tabs = null;
+    
 }
 
 TestRunnerContainer.prototype = {
@@ -54,15 +58,17 @@ TestRunnerContainer.prototype = {
         var mainWindow = getMainWindow();
         var tabBrowser = mainWindow.document.getElementById('content');
         var numTabsToUse = this.getNumWorkTabs();
-        dump('TestRunnerContainer::start(): tabBrowser.mTabs.length < ' +
-                '(this.baseNumTabs+numTabsToUse) && this.testRunners.' +
-                'length !== 0 ====== ' + tabBrowser.mTabs.length + '< (' +
-                this.baseNumTabs + '+' + numTabsToUse + ') && ' + 
-                this.testRunners.length + '!== 0 ======== ' + (tabBrowser.mTabs.length < (this.baseNumTabs+numTabsToUse) &&
-                this.testRunners.length !== 0) + '\n');
-        if (tabBrowser.mTabs.length < (this.baseNumTabs+numTabsToUse) &&
-            this.testRunners.length !== 0)
-        {
+        var firstEmptyIndex = 0;
+        var hasEmptyIndex = false;
+        for (var index in this.tabs) {
+                if (this.tabs[index] === null) {
+                    hasEmptyIndex= true;
+                    firstEmptyIndex = parseInt(index);
+                    this.tabs[index] = true;
+                    break;
+                }
+        }
+        if (hasEmptyIndex === true && this.testRunners.length !== 0) {
             var testRunner = this.testRunners.pop();
             var formPanel = this.formPanels.pop();
             var formIndex = this.formIndexes.pop();
@@ -71,7 +77,12 @@ TestRunnerContainer.prototype = {
             var resultsManager = this.resultsManagers.pop();
             
             testRunner.do_test(formPanel, formIndex, field, testValue, 
-                    resultsManager);
+                    resultsManager, firstEmptyIndex+this.baseNumTabs);
+            
+        }
+        else if (this.testRunners.length === 0) {
+            this.keepChecking = false;
+            this.testManager.doneTesting();
             
         }
         
@@ -97,35 +108,64 @@ TestRunnerContainer.prototype = {
         }
     }
     ,
-    keepChecking: true
+    clear: function (){
+        this.testRunners.splice(0, this.testRunners.length);
+        this.formPanels.splice(0, this.formPanels.length);
+        this.formIndexes.splice(0, this.formPanels.length);
+        this.fields.splice(0, this.formPanels.length);
+        this.testValues.splice(0, this.formPanels.length);
+        this.resultsManagers.splice(0, this.formPanels.length);
+    }
+    ,
+    setup: function(currentNumTabs, testManager) {
+        this.baseNumTabs = currentNumTabs
+        this.testManager = testManager;
+        this.tabs = null;
+        this.tabs = new Array();
+        for (var i = 0; i < this.getNumWorkTabs(); i++){
+            this.tabs[i] = null;
+            getMainWindow().document.getElementById('content').addTab('about:blank');
+        }
+    }
+    ,
+    freeTab: function(tabIndex) {
+        this.tabs[tabIndex-this.baseNumTabs] = null;
+    }
+    ,
+    clearWorkTabs: function () {
+        var oldIndex = getMainWindow().gBrowser.mTabContainer.selectedIndex;
+        
+        for (var i = this.getNumWorkTabs(); i > 0; i--) {
+            var tab = getMainWindow().gBrowser.mTabs.item(this.baseNumTabs);
+            getMainWindow().gBrowser.removeTab(tab);
+            
+        }
+        
+        getMainWindow().gBrowser.mTabContainer.selectedIndex = oldIndex;
+    }
+    ,
+    /**
+     * Stops the running of tests in the TestRunnerContainer.
+     */
+    stop: function(){
+        this.keepChecking = false;
+        this.clear();
+    }
 };
 
 /**
  * If currentNumTabs is provided, the container is cleared.
  */
-function getTestRunnerContainer(currentNumTabs){
+function getTestRunnerContainer(currentNumTabs, testManager){
     
     if (typeof(xssme__testrunnercontainer__) == 'undefined' || 
             !xssme__testrunnercontainer__ )
     {
         xssme__testrunnercontainer__ = new TestRunnerContainer(currentNumTabs);
-        xssme__testrunnercontainer__.start();
     }
     
-    if (currentNumTabs) {
-        xssme__testrunnercontainer__.baseNumTabs = currentNumTabs;
-        xssme__testrunnercontainer__.testRunners.splice(0, 
-                xssme__testrunnercontainer__.testRunners.length);
-        xssme__testrunnercontainer__.formPanels.splice(0, 
-                xssme__testrunnercontainer__.formPanels.length);
-        xssme__testrunnercontainer__.formIndexes.splice(0,
-                xssme__testrunnercontainer__.formPanels.length);
-        xssme__testrunnercontainer__.fields.splice(0,
-                xssme__testrunnercontainer__.formPanels.length);
-        xssme__testrunnercontainer__.testValues.splice(0,
-                xssme__testrunnercontainer__.formPanels.length);
-        xssme__testrunnercontainer__.resultsManagers.splice(0,
-                xssme__testrunnercontainer__.formPanels.length);
+    if (currentNumTabs && testManager) {
+        xssme__testrunnercontainer__.setup(currentNumTabs, testManager);
  
     }
     
