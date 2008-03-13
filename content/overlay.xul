@@ -36,9 +36,9 @@ tools@securitycompass.com
                 <menuitem 
                           label="&sqlime.options;" 
                           oncommand="window.openDialog('chrome://sqlime/content/preferences.xul')" 
-                />
+                /> 
                 <menuitem label="&sqlime.about;" oncommand="window.openDialog('chrome://sqlime/content/about.xul');" />
-                <menuitem label="&sqlime.help;" oncommand="window.open('http://www.securitycompass.com', 'helpwindow', '');" />  
+                <menuitem label="&sqlime.help;" oncommand="window.open('http://securitycompass.com/exploitme.shtml', 'helpwindow', '');" />  
             </menupopup>
         </menu>
     </menupopup>
