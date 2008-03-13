@@ -42,7 +42,7 @@ tools@securitycompass.com
 						type="int" />
         </preferences>
         <checkbox label="Show Context Menu" preference="showContextMenu" />
-        <label value="Prefered Number of Attacks to Test" control="preferedNumAttacksTxtBox" />
+        <label value="Preferred Number of Attacks to Test" control="preferedNumAttacksTxtBox" />
         <textbox id="preferedNumAttacksTxtBox" preference="preferedNumAttacks" />
         <label value="Number of tabs to use for testing" control="preferednumtabs" />
         <textbox id="preferednumtabs" preference="numtabstouse" />
