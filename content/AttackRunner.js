@@ -180,7 +180,7 @@ AttackRunner.prototype = {
 
                 resultsManager.addObserver(attackHttpResponseObserver);
                 observerService.addObserver(attackHttpResponseObserver, 
-                        'http-on-examine-response', false);
+                        AttackHttpResponseObserver_topic, false);
                 
             }
             var formGotSubmitted = self.submitForm(
@@ -192,25 +192,19 @@ AttackRunner.prototype = {
         //this should fire only *after* the form has been sumbitted and the new
         //page has loaded.
         function afterWorkTabHasSubmittedAndLoaded(event){
+            browser.removeEventListener('pageshow', afterWorkTabHasSubmittedAndLoaded, false);
+            //var foo = "event = {";
+            //for (var key in event) {
+            //    foo += key + "=>" + event[key] + ";"
+            //} 
+            //foo += "}"
             
-            if (currentTab.linkedBrowser.webNavigation.currentURI.spec !== event.currentTarget.webNavigation.currentURI.spec  ) {
-                browser.removeEventListener('pageshow', afterWorkTabHasSubmittedAndLoaded, false);
-                //var foo = "event = {";
-                //for (var key in event) {
-                //    foo += key + "=>" + event[key] + ";"
-                //} 
-                //foo += "}"
-                
-                var results = resultsManager.evaluate(event.currentTarget, self);
-                for each (result in results){
-                    tabManager.addFieldData(result);
-                }
-                getTestRunnerContainer().freeTab(tabIndex);
-                
+            var results = resultsManager.evaluate(event.currentTarget, self);
+            for each (result in results){
+                tabManager.addFieldData(result);
             }
-            else {
-
-            }
+            getTestRunnerContainer().freeTab(tabIndex);
+            
         }
         
     }

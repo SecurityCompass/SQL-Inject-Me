@@ -478,36 +478,32 @@ ResultsManager.prototype = {
      * DOMContentLoaded which should happen after a response code has been 
      * received.
      */
-    gotChannelForAttackRunner: function( nsiHttpChannel, attackRunner){
-        var attackHttpResponseObserver = 
-                this.httpresponseObservers[this.attacks.indexOf(attackRunner)];
-        
+    gotChannelForAttackRunner: function( nsiHttpChannel, attackHttpResponseObserver){
+        var attackRunner = attackHttpResponseObserver.attackRunner;
         var observerService = Components.
                 classes['@mozilla.org/observer-service;1'].
                 getService(Components.interfaces.nsIObserverService);
         var results = checkForServerResponseCode(nsiHttpChannel)
-        dump('resultmanager::gotChannelForAttackRunner results: ' + results + '\n');
         if (results != null){
             dump('resultmanager::gotChannelForAttackRunner results: ' + results + '\n');
             for each(var result in results){
                 result.testData = attackRunner.testData;
-                result.fieldIndex = attackRunner.fieldIndex;
-                result.formIndex = attackRunner.formIndex;
+                result.field = attackRunner.field;
             }
             var resultsWrapper = new Object();
             resultsWrapper.results = results;
-            resultsWrapper.fieldIndex = attackRunner.fieldIndex;
-            resultsWrapper.formIndex = attackRunner.formIndex;
+            resultsWrapper.field = attackRunner.field;
+            
             observerService.removeObserver(attackHttpResponseObserver, 
                     AttackHttpResponseObserver_topic);
-            
-            this.httpresponseObservers.
-                    splice(this.attacks.indexOf(attackRunner), 1);
                     
             this.addResults(resultsWrapper);
-
+            
         }
-        
+        else {
+            Components.utils.reportError('Failed to get http status code.');
+        }
+        dump('resultmanager::gotChannelForAttackRunner done.\n');
     }
     ,
     /**

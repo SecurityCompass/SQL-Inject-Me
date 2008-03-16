@@ -33,7 +33,8 @@ function AttackHttpResponseObserver(attackRunner, resultsManager){
 }
 
 AttackHttpResponseObserver.prototype = {
-    
+    className: 'AttackHttpResponseObserver'
+    ,
     QueryInterface: function(iid) {
         if (iid.equals(Components.interfaces.nsIObserver) || 
             iid.equals(Components.interfaces.nsISupports))
@@ -59,6 +60,8 @@ AttackHttpResponseObserver.prototype = {
             }
             catch(err) {
                 dump('AttackHttpResponseObserver::observe: ' + err + '\n');
+                for(var k in err)
+                    dump('AttackHttpResponseObserver::observe: err['+k+'] ==' + err[k] + '\n')
             }
         }
         
