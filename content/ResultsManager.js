@@ -162,40 +162,6 @@ ResultsManager.prototype = {
         return rv;
     }
     ,
-    showVulnerablFieldSummaryChart: function(vulnerableFields, allFields) {
-        var rv = "";
-        rv += "\n<table style='width:100%'>";
-        rv += "\n<thead><tr>";
-        rv += "\n<th colspan=\"3\" style='text-align: center'>Fields Tested</th>";
-        rv += "\n</tr></thead>";
-        rv += "\n<tbody>";
-        rv += "\n<tr>";
-        rv += "\n<td>Presumed Vulnerable</td>";
-        rv += '<td class="bar"><div style="width: ' +
-                Math.round((vulnerableFields.length/allFields.length)*100).toString() +
-                '%; background-color: red;color: white;border: none;">&nbsp;</div></td>';
-        rv += "\n<td>";
-        rv += vulnerableFields.length.toString(); 
-        rv += "\n</td>";
-        rv += "\n</tr>";
-        rv += "\n<tr>";
-        rv += "\n<td '>Presumed Invulnerable</td>";
-        rv += '<td class="bar"><div style="width: ' +
-            Math.round(((allFields.length-vulnerableFields.length )/allFields.length)*100).toString() +
-            '%; background-color: #00ff00;color: white;border: none;">&nbsp;</div></td>';
-        rv += "\n<td>";
-        rv += (allFields.length-vulnerableFields.length).toString(); 
-        rv += "\n</td>";
-        rv += "\n</tr>";
-        rv += "\n</tbody>";
-        rv += "\n<tfoot><tr><td><div class='fail legend'>&nbsp;</div> The character was found unencoded in the result page<br />";
-        rv += "\n<div class='pass legend'>&nbsp;</div> The character was not found unencoded in the result page</td></tr></tfoot>";
-        rv += "\n</table>";
-
-        return rv;
-
-    }
-    ,
     makeResultsGraph: function (numTestsRun, numFailed, numWarned, numPassed){
         var rv = '';
         var errorCSSClass = 'fail';
@@ -400,7 +366,7 @@ ResultsManager.prototype = {
         }
         
         results += "<div class='stringSummary'>"
-        results += "<h2>SQL Injection String Tests Summary ("+numTestsRun+" tests executed)</h2>"
+        results += "<h2>SQL Injection String Tests Summary ("+numTestsRun+" results recorded)</h2>"
         if (errorstr !== undefined) results += "<div class='withError'>"
         results += this.makeResultsGraph(numTestsRun, numFailes, numWarnings, 
                 numPasses);
