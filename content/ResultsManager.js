@@ -398,18 +398,7 @@ ResultsManager.prototype = {
         if (errorstr !== undefined) {
             results += "<div class='errorMsg'>" + errorstr + "</div>";
         }
-
-        if (testManager.testType.heuristicTest) {
-            results += "<h2>SQL Injection Heuristic Test Results</h2>";
-            if (errorstr !== undefined) results += "<div class='withError'>"
-            results += this.showHeuristicsResultTable(
-                    testManager.vulnerableFields,
-                    this.extensionManager.getFieldsToTest(testManager.testType),
-                    this.extensionManager.getHeuristicTestChars(),
-                    errorstr);
-            if (errorstr !== undefined) results += "</div>"
-
-        }
+        
         results += "<div class='stringSummary'>"
         results += "<h2>SQL Injection String Tests Summary ("+numTestsRun+" tests executed)</h2>"
         if (errorstr !== undefined) results += "<div class='withError'>"
@@ -541,55 +530,6 @@ ResultsManager.prototype = {
             this.allResultsLogged = true;
         }
         
-    }
-    ,
-    showHeuristicsResultTable: function(vulnerableFields, allFields, heuristicChars, error)
-    {
-        var copyOfVulnerableFields = new Array();
-        var rv="";
-        
-        for each (var field in allFields) {
-            for each(var vulnField in vulnerableFields) {
-                if (field.formIndex === vulnField.formIndex &&
-                    field.index === vulnField.index)
-                {
-                    field.vulnerableChars = vulnField.vulnerableChars;
-                    break;
-                }
-            }
-        }
-        
-        rv += "<table class='characterResults'>";
-        rv += "<tr>";
-        rv += "<td>&nbsp;</td>"
-        for (var index in heuristicChars) {
-            rv += "<td class='head'>&#" + heuristicChars.charCodeAt(index) + ";</td>"
-        }
-        rv += "</tr>";
-        for each (var field in allFields) {
-            rv += "<tr>";
-            var vulnChars = field.vulnerableChars;
-            rv += "<td nowrap='nowrap'>"+(field.formName?field.formName:"unamed form")+"::" + (field.name?field.name:"unnamed field")+"</td>";
-            for each (var c in heuristicChars) {
-                if (vulnChars && vulnChars.indexOf(c) !== -1) {
-                    rv += "<td class='fail'>&nbsp;</td>";
-                }
-                else {
-                    rv += "<td class='pass'>&nbsp;</td>";
-                }
-            }
-            rv += "</tr>";
-        }
-        rv += "</tbody>";
-        rv += "\n<tfoot><tr><td colspan='"+(heuristicChars.length+1)+"'><div class='fail legend'>&nbsp;</div>The character was found unencoded in the result page.</td></tr>";
-        rv += "\n<tr><td colspan='"+(heuristicChars.length+1)+"'><div class='pass legend'>&nbsp;</div> The character was not found unencoded in the result page.</td></tr>";
-        if (error) {
-            rv += "\n<tr><td colspan='"+(heuristicChars.length+1)+"'><div class='error legend'>&nbsp;</div> This combination was not tested due to errors in test.</td></tr>";
-        }
-        rv += "</tfoot>";
-        rv += "</table>";
-        
-        return rv;
     }
     ,
     header: function () {
