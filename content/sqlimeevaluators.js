@@ -42,11 +42,11 @@ function checkForErrorString(browser) {
             dump('sqlimeevaluators::checkForErrorString browser.fastFind.find(error.string, false) == ' + browser.fastFind.find(error.string, false) + '\n');
             if (browser.fastFind.find(error.string, false) !== Components.interfaces.nsITypeAheadFind.FIND_NOTFOUND) { //, false, true, false, true, false)){
                 
-                result = new Result(RESULT_TYPE_ERROR, 100, "Was able to find error string ('" + error.string + "')");
+                result = new Result(RESULT_TYPE_ERROR, 100, "Error string found: '" + encodeString(error.string) + "'");
                 
             }
             else {
-                result = new Result(RESULT_TYPE_PASS, 100, "Was not able to find error string ('" + error.string + "')");
+                result = new Result(RESULT_TYPE_PASS, 100, "Error String not found: '" + encodeString(error.string) + "'");
             }
             results.push(result);
         }
@@ -68,11 +68,13 @@ function checkForServerResponseCode(nsiHttpChannel){
         else {
             var result;
             var responseCode = nsiHttpChannel.responseStatus;
+            var displayString = "Server Status Code: " + encodeString(responseCode.toString()) + " " +
+                    encodeString(nsiHttpChannel.responseStatusText);
             if (responseCode == 200){
-                result = new Result(RESULT_TYPE_PASS, 100, "Server returned OK return code ('" + responseCode + "')");
+                result = new Result(RESULT_TYPE_PASS, 100, displayString );
             }
             else {
-                result = new Result(RESULT_TYPE_ERROR, 100, "server returned a bad response code :" + responseCode + ", " + nsiHttpChannel.responseStatusText + "\n" );
+                result = new Result(RESULT_TYPE_ERROR, 100, displayString);
             }
         }
         return [result];
