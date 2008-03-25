@@ -196,9 +196,8 @@ extension.prototype = {
             return;
         }
         else {
-            testCount = fieldsToTest.length * testType.count;
-            // SQL Inject Me has only one type of test (though 2 results are
-            // yielded)
+            testCount = fieldsToTest.length * testType.count * 2;
+            // *2 is to signify the number of evaluators that are registered
         }
         
         this.warningDialog = window.openDialog(
