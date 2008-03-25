@@ -70,8 +70,15 @@ XssOverlay.prototype = {
     }
     ,
     onUnload: function() {
-        dump('XssOverlay::onUnload this.contextMenuObserver' + this.contextMenuObserver + '\n');
-        //Do nothing right now.
+        var prefService = Components.classes['@mozilla.org/preferences-service;1'].
+        getService(Components.interfaces.nsIPrefService);
+        
+        var branch = prefService.getBranch('');
+        
+        var observableBranch = branch.
+                QueryInterface(Components.interfaces.nsIPrefBranch2);
+        
+        observableBranch.removeObserver('extensions.sqlime.showcontextmenu', this.contextMenuObserver)
     }
 };
 
