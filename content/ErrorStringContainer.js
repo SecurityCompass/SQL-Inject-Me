@@ -24,7 +24,6 @@ tools@securitycompass.com
  * ErrorStringContainer.js
  * @requires PreferenceStringContainer.js
  */
- 
 function ErrorStringContainer(){
     this.init();
 }
