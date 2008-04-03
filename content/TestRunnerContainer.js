@@ -124,7 +124,6 @@ TestRunnerContainer.prototype = {
         this.tabs = new Array();
         for (var i = 0; i < this.getNumWorkTabs(); i++){
             this.tabs[i] = null;
-            getMainWindow().document.getElementById('content').addTab('about:blank');
         }
     }
     ,
@@ -133,15 +132,7 @@ TestRunnerContainer.prototype = {
     }
     ,
     clearWorkTabs: function () {
-        var oldIndex = getMainWindow().gBrowser.mTabContainer.selectedIndex;
-        
-        for (var i = this.getNumWorkTabs(); i > 0; i--) {
-            var tab = getMainWindow().gBrowser.mTabs.item(this.baseNumTabs);
-            getMainWindow().gBrowser.removeTab(tab);
-            
-        }
-        
-        getMainWindow().gBrowser.mTabContainer.selectedIndex = oldIndex;
+        //not needed any more.
     }
     ,
     /**
