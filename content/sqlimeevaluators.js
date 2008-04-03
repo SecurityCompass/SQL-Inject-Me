@@ -27,41 +27,62 @@ tools@securitycompass.com
  * @require ErrorStringContainer.js
  */
 
+/**
+ * Checks the source of a page for stored error strings
+ */
+function checkSrcForErrorString(streamListener) {
+
+    var errorContainer = getErrorStringContainer();
+    var results = new Array();
+    var doc = streamListener.data;
+    dump("\nStart freeze...");
+    for each (var error in errorContainer.getStrings()){
+        var result;
+        
+        if (doc.indexOf(error.string) !== -1) {
+            result = new Result(RESULT_TYPE_ERROR, 100, "Error string found: '" + encodeString(error.string) + "'");
+        }
+        else {
+            result = new Result(RESULT_TYPE_PASS, 100, "Error string not found: '" + encodeString(error.string) + "'");
+        }
+        
+        results.push(result);
+    }
+    dump("\nEnd freeze...");
+
+    
+    return results;
+}
+
+/**
+ * Checks the browser for stored error strings.
+ */
 function checkForErrorString(browser) {
 
     var errorContainer = getErrorStringContainer();
     var results = new Array();
-//     dump('sqlimeevaluators::checkForErrorString gFindInstData: ' + (new nsFindInstData()) + ' ' + findInPage + '\n');
-//     dump('sqlimeevaluators::checkForErrorString getMainWindow() ' + getMainWindow() + '  getMainWindow().webBrowserFind ' + browser.webBrowserFind + '\n');
-    dump('sqlimeevaluators::checkForErrorString browswer._fastFind == ' +browser._fastFind + '\n');
+    var doc = browser.contentDocument.toString();
+    dump("\nStart freeze...");
     for each (var error in errorContainer.getStrings()){
         var result;
-//        dump('sqlimeevaluators::checkForErrorString going to check ' + browser.spec + ' with value \'' + browser.webNavigation.document.body.innerHTML + '\' for \'' + error.string + '\'\n');
-        try {
-            browser.fastFind.init(browser.docShell);
-            dump('sqlimeevaluators::checkForErrorString browser.fastFind.find(error.string, false) == ' + browser.fastFind.find(error.string, false) + '\n');
-            if (browser.fastFind.find(error.string, false) !== Components.interfaces.nsITypeAheadFind.FIND_NOTFOUND) { //, false, true, false, true, false)){
-                
-                result = new Result(RESULT_TYPE_ERROR, 100, "Error string found: '" + encodeString(error.string) + "'");
-                
-            }
-            else {
-                result = new Result(RESULT_TYPE_PASS, 100, "Error String not found: '" + encodeString(error.string) + "'");
-            }
-            results.push(result);
+        
+        if (doc.indexOf(error.string) !== -1) {
+            result = new Result(RESULT_TYPE_ERROR, 100, "Error string found: '" + encodeString(error.string) + "'");
         }
-        catch (err){
-            dump('problem in sqlimeevaluators::checkForErrorString... ' + err + '\n');   
+        else {
+            result = new Result(RESULT_TYPE_PASS, 100, "Error string not found: '" + encodeString(error.string) + "'");
         }
+        
+        results.push(result);
     }
+    dump("\nEnd freeze...");
+
     
     return results;
 }
 
 function checkForServerResponseCode(nsiHttpChannel){
     try{
-        dump('sqlimeevaluators::checkForServerResponseCode nsiHttpChannel.toString(): ' + nsiHttpChannel.toString() + '\n');
-        dump('sqlimeevaluators::checkForServerResponseCode nsiHttpChannel.responseStatus: ' + nsiHttpChannel.responseStatus + '\n');
         if ((nsiHttpChannel.responseStatus === undefined || nsiHttpChannel.responseStatus === null)){
             return null;   
         }
@@ -80,7 +101,7 @@ function checkForServerResponseCode(nsiHttpChannel){
         return [result];
     }
     catch(err){
-        dump('sqlimeevaluators::checkForServerResponseCode err: ' + err + '\n');
+        Components.utils.reportError(err);
         return false;
     }
 }

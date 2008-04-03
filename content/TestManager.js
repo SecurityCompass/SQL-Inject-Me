@@ -82,9 +82,9 @@ TestManager.prototype = {
     evaluateSource: function(streamListener) {
         
         var resultData = streamListener.data;
-        var testValue = streamListener.attackRunner.testValue;
+        var testData = streamListener.attackRunner.testData;
         
-        if (resultData.indexOf(testValue.string) !== -1) {
+        if (resultData.indexOf(testData.string) !== -1) {
             var vulnerableField = streamListener.attackRunner.field;
             var isVulnerablFieldAlreadyLogged = false;
             if (this.vulnerableFields.length > 0) {
@@ -93,7 +93,7 @@ TestManager.prototype = {
                     if (areFormIndexsSame) {
                         var areFieldsSame = value.index === vulnerableField.index;
                         if (areFieldsSame) {
-                            value.vulnerableChars += testValue.string[testValue.string.length-1];
+                            value.vulnerableChars += testData.string[testData.string.length-1];
                             isVulnerablFieldAlreadyLogged = true;
                             break;
                         }
@@ -102,7 +102,7 @@ TestManager.prototype = {
             }
             
             if (isVulnerablFieldAlreadyLogged === false) {
-                streamListener.attackRunner.field.vulnerableChars = testValue.string[testValue.string.length-1];
+                streamListener.attackRunner.field.vulnerableChars = testData.string[testData.string.length-1];
                 this.vulnerableFields.push(streamListener.attackRunner.field);
             }
             
@@ -132,8 +132,8 @@ TestManager.prototype = {
                 
                 var testRunner = new AttackRunner();
                 
-                var testValue = new Object();
-                testValue.string = testRunner.uniqueID.toString() + c.toString();
+                var testData = new Object();
+                testData.string = testRunner.uniqueID.toString() + c.toString();
                 
                 this.resultsStillExpected++;
                 
@@ -141,7 +141,7 @@ TestManager.prototype = {
                         null,
                         field.formIndex,
                         field,
-                        testValue,
+                        testData,
                         self);
                 
             }
@@ -167,6 +167,7 @@ TestManager.prototype = {
         this.resultsManager = new ResultsManager(this.controller);
         
         this.resultsManager.addEvaluator(checkForErrorString);
+        this.resultsManager.addSourceEvaluator(checkSrcForErrorString);
         
         getTestRunnerContainer().clear();
         var testStrings = getAttackStringContainer().getStrings();
@@ -235,6 +236,7 @@ TestManager.prototype = {
             else {
                 window.setTimeout(checkAgain, 1);
             }
+            
         }
         else if (this.controller) {
             if (this.resultsManager.allResultsLogged === false){
@@ -243,6 +245,7 @@ TestManager.prototype = {
                 //Components.utils.reportError('results not all logged yet');
                 return
             }
+            dump('\ndone now.')
             getTestRunnerContainer().clearWorkTabs();
             this.resultsManager.showResults(this);
             this.controller.postTest();

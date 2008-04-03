@@ -67,7 +67,7 @@ ResultsManager.prototype = {
         }
         this.fields[field.formIndex][field.index].addResults(resultsWrapper.results);
         this.extensionManager.finishedTest();
-        if (this.attacks.length === 0 && this.sourceListeners.length === 0) {
+        if (this.sourceListeners.length === 0 && getTestRunnerContainer().testRunners.length === 0) {
             dump('\nall results logged now.')
             this.allResultsLogged = true;
         }
@@ -283,7 +283,6 @@ ResultsManager.prototype = {
                 testFieldName = (testData.name !== undefined ? testData.name : "unnamed field");
                 break;
             }
-
         }
         rv += "<div class='field'>" + (testFieldName?testFieldName:'unnamed field') + "</div>";
         rv += "<div class='submitted'>";
@@ -338,10 +337,11 @@ ResultsManager.prototype = {
      * @param errorstr {string} a string with an error message (optional)
      */
     showResults: function(testManager, errorstr){
-        if ((this.attacks.length != 0 || this.sourceListeners.length != 0) && errorstr === undefined){
+        if (this.sourceListeners.length != 0 && errorstr === undefined){
             //there may be no more tests to start but there are still some
             //to finish. Wait until they're all done.
             var self = this;
+            dump('doing the resultsmanager wait...' + this.sourceListeners.length);
             setTimeout(function(){self.showResults(testManager)}, 1000);
             return;
         }
@@ -482,19 +482,23 @@ ResultsManager.prototype = {
                 result.testData = attackRunner.testData;
                 result.fieldIndex = attackRunner.fieldIndex;
                 result.formIndex = attackRunner.formIndex;
+                
             }
             var resultsWrapper = new Object();
             resultsWrapper.results = results;
             resultsWrapper.field = attackRunner.field;
             this.addResults(resultsWrapper);
         }
-        
         var index = this.sourceListeners.indexOf(streamListener);
         this.sourceListeners.splice(index, 1);
-        if (this.attacks.length === 0 && this.sourceListeners.length === 0) {
+        if (this.sourceListeners.length === 0 &&
+            getTestRunnerContainer().testRunners.length === 0)
+        {
             dump('\nall results now logged');
             this.allResultsLogged = true;
         }
+        getTestRunnerContainer().freeTab(attackRunner.tabIndex);
+
         
     }
     ,

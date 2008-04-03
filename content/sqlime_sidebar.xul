@@ -36,6 +36,8 @@ tools@securitycompass.com
     <script type="application/x-javascript"
             src="chrome://sqlime/content/sidebarBuilder.js" />
     <script type="application/x-javascript"
+            src="chrome://sqlime/content/StreamListener.js" />
+    <script type="application/x-javascript"
             src="chrome://sqlime/content/PrefObserver.js" />
 	<script type="application/x-javascript"
             src="chrome://sqlime/content/TestManager.js" />

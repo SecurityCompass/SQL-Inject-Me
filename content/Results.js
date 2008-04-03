@@ -39,6 +39,5 @@ function Result(type, value, message){
     this.value = value;
     this.type = type;
     this.message = message;
-    dump('Result::Ctor (' + type+ ' ' + value+ ' ' + message + '\n');
 }
 

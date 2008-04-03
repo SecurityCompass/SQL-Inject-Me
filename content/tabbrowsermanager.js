@@ -103,7 +103,7 @@ TabManager.prototype = {
         dump('stopping tabbrowsermanager::writeTabHistory\n');
     }
     ,
-    writeTabForms: function(forms, testFormIndex, testFieldIndex, testValue){
+    writeTabForms: function(forms, testFormIndex, testFieldIndex, testData){
         dump('-=-=-=-writeTabForms::forms ' + forms[0]); 
         if (forms[testFormIndex] === undefined){
             dump('got an undefined\n');   
@@ -123,20 +123,20 @@ TabManager.prototype = {
                 if (formIndex !== null && 
                     formIndex === testFormIndex && 
                     elementIndex === testFieldIndex &&
-                    testValue !== null
+                    testData !== null
                    ) 
                 {
                     dump('going to force element ' +element.name  +' ('+ elementIndex
-                            +') to have value ' + testValue+ '\n');
+                            +') to have value ' + testData+ '\n');
                     if(element.nodeName.toLowerCase() === 'select') {
                         var newOption = forms[formIndex].ownerDocument.createElement('option');
-                        newOption.setAttribute('value', testValue.string);
-                        newOption.innerHTML = testValue.string;
+                        newOption.setAttribute('value', testData.string);
+                        newOption.innerHTML = testData.string;
                         element.options[element.options.length] = newOption;
                         element.selectedIndex = element.options.length - 1;
                     }
                     else {
-                        element.value = testValue.string;
+                        element.value = testData.string;
                     }
                     dump('element[' + elementIndex + '] has value' + 
                             element.value + ' \n');
@@ -161,7 +161,7 @@ TabManager.prototype = {
         }
     }
     ,
-    getTabData: function(forms, testFormIndex, testFieldIndex){
+    getTabData: function(forms, testFormIndex, testFieldIndex, testString){
         dump('writeTabForms::forms ' + forms[0] + '\n');
         var rv = new Array();
         var formIndex = testFormIndex;
@@ -173,7 +173,7 @@ TabManager.prototype = {
             var element = forms[formIndex].elements[elementIndex];
             var fieldInfo = new Object();
             fieldInfo.name = element.name;
-            fieldInfo.data = element.value;
+            fieldInfo.data = (elementIndex == testFieldIndex && testString)?testString:element.value;
             fieldInfo.tested = (elementIndex == testFieldIndex);
             rv.push(fieldInfo);
         }
@@ -193,9 +193,8 @@ TabManager.prototype = {
      * This returns the data in a form 
      */
     getFormDataForURL: function(forms, testFormIndex, testFieldIndex, 
-            testValue)
+            testData)
     {
-        dump('getFormDataForURL::forms forms['+testFormIndex|']==' + forms[testFormIndex] + '\n');
         var formIndex = testFormIndex;
         var rv = '';
         for (var elementIndex = 0; 
@@ -203,6 +202,12 @@ TabManager.prototype = {
             elementIndex++)
         {
             var element = forms[testFormIndex].elements[elementIndex];
+            if (elementIndex == testFieldIndex) {
+                if (rv.length != 0){
+                    rv+='&';
+                }                
+                rv += element.name +'='+testData;
+            }
             if (element.value) {
                 if (rv.length != 0){
                     rv+='&';
@@ -210,7 +215,6 @@ TabManager.prototype = {
                 rv += element.name +'='+element.value;
             }
         }
-        dump('tabbrowsermanager::getFormDataForURL returns: ' + rv + '\n');
         return rv;
         
     }

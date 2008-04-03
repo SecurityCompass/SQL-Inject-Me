@@ -62,7 +62,7 @@ AttackRunner.prototype = {
         return formFound;
     }
     ,
-    do_test: function(formPanel, formIndex, field, testValue, resultsManager,
+    do_test: function(formPanel, formIndex, field, testData, resultsManager,
             tabIndex)
     {
         var mainBrowser = getMainWindow().getBrowser();
@@ -70,16 +70,36 @@ AttackRunner.prototype = {
         var wroteTabData = false;
         var tabManager = new TabManager();
         var self = this; //make sure we always have a reference to this object
-        var browser = mainBrowser.getBrowserAtIndex(tabIndex);
+        var formData = null;
+        
+        //var browser = mainBrowser.getBrowserAtIndex(tabIndex);
              
-        this.testValue = testValue;
         this.formIndex = formIndex;
         this.fieldIndex = field.index;
         this.field = field;
-        browser.webNavigation.stop(Components.interfaces.nsIWebNavigation.STOP_ALL);
-
+        this.tabIndex = tabIndex;
+        
         tabManager.readTabData(currentTab);
-        setTimeout(function() {afterWorkTabStopped()}, 10);
+        
+        if (field)
+        {
+            formData = tabManager.getFormDataForURL(mainBrowser.
+                    contentDocument.forms,  formIndex, field.index, 
+                    testData);
+        }
+        else 
+        {
+            formData = tabManager.getFormDataForURL(mainBrowser.
+                    contentDocument.forms,  formIndex, null, null);
+        }
+        this.testData = tabManager.getTabData(mainBrowser.
+                    contentDocument.forms,  formIndex, field.index, testData.string);
+
+        
+        dump('\ndoing source test...');
+        this.do_source_test(formIndex, formIndex, field, testData,
+                resultsManager, mainBrowser,formData);
+
         
         function afterWorkTabStopped(){
             browser.addEventListener('pageshow',
@@ -127,16 +147,16 @@ AttackRunner.prototype = {
                 getTestManager().cannotRunTests();
                 return
             }
-
+            
             //this will copy all the form data...
             try { 
                 if (field)
                 {
                     tabManager.writeTabForms(browser.contentDocument.
-                            forms,  formIndex, field.index, testValue);
+                            forms,  formIndex, field.index, testData);
                     formData = tabManager.getFormDataForURL(browser.
                             contentDocument.forms,  formIndex, field.index, 
-                            testValue);
+                            testData);
                 }
                 else 
                 {
@@ -149,9 +169,8 @@ AttackRunner.prototype = {
             catch(e) {
                 Components.utils.reportError(e + " " + (browser.webNavigation.currentURI?browser.webNavigation.currentURI.spec:"null"))
             }
-            dump('AttackRunner::afterWorkTabHasLoaded  testValue===' + testValue + '\n');
-
-
+            dump('AttackRunner::afterWorkTabHasLoaded  testData===' + testData + '\n')
+            
             self.testData = tabManager.getTabData(browser.
                     contentDocument.forms,  formIndex, field.index);
             dump('attackRunner::testData == ' + this.testData + '\n');
@@ -193,20 +212,63 @@ AttackRunner.prototype = {
         //page has loaded.
         function afterWorkTabHasSubmittedAndLoaded(event){
             browser.removeEventListener('pageshow', afterWorkTabHasSubmittedAndLoaded, false);
-            //var foo = "event = {";
-            //for (var key in event) {
-            //    foo += key + "=>" + event[key] + ";"
-            //} 
-            //foo += "}"
             
-            var results = resultsManager.evaluate(event.currentTarget, self);
-            for each (result in results){
-                tabManager.addFieldData(result);
-            }
-            getTestRunnerContainer().freeTab(tabIndex);
+            setTimeout(callEvaluate, 1, browser, self, resultsManager)
             
         }
         
     }
-    
+    ,
+    do_source_test:function(formPanel, formIndex, field, testData, resultsManager, 
+            browser, formData) {
+        var streamListener = new StreamListener(this, resultsManager);
+        resultsManager.addSourceListener(streamListener);
+
+        // the IO service
+        var ioService = Components.classes['@mozilla.org/network/io-service;1']
+                .getService(Components.interfaces.nsIIOService);
+        var formURL = browser.contentDocument.URL;
+        var form = browser.contentDocument.forms[formIndex];
+        var formAction = form.action ? form.action : browser.contentDocument.
+                location.toString();
+                
+        dump('AttackRunner::do_source_test  formAction=== '+formAction+'\n');
+        if (form.method.toLowerCase() != 'post'){
+            formAction += formAction.indexOf('?') === -1 ? '?' : '&';
+            formAction += formData;
+        } 
+        
+        dump('attackrunner::do_source_test::formAction == ' + formAction + '\n');
+        dump('attackrunner::do_source_test::formData == ' + formData + '\n');
+        
+        var uri = ioService.newURI(formAction, null, null);
+        var referingURI = ioService.newURI(formURL, null, null);
+        var channel = ioService.newChannelFromURI(uri);
+        channel.QueryInterface(Components.interfaces.nsIHttpChannel).
+                referrer = referingURI;
+        
+        if (form.method.toLowerCase() == 'post'){
+            var inputStream = Components.
+                    classes['@mozilla.org/io/string-input-stream;1'].
+                    createInstance(Components.interfaces.nsIStringInputStream);
+            inputStream.setData(formData, formData.length);
+            channel.QueryInterface(Components.interfaces.nsIUploadChannel).
+                    setUploadStream(inputStream, 
+                    'application/x-www-form-urlencoded', -1);
+            channel.QueryInterface(Components.interfaces.nsIHttpChannel).
+                    requestMethod = 'POST';
+        }
+        
+        var streamListener = new StreamListener(this, resultsManager);
+        streamListener.testData = this.testData;
+        channel.asyncOpen(streamListener, null);
+    }
+}
+
+function callEvaluate(browser, attackRunner, resultsManager) {
+    var results = resultsManager.evaluate(browser, attackRunner);
+    for each (result in results){
+        tabManager.addFieldData(result);
+    }
+    getTestRunnerContainer().freeTab(attackRunner.tabIndex);
 }

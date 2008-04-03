@@ -32,7 +32,7 @@ function TestRunnerContainer(currentNumTabs){
     this.formPanels = new Array();
     this.formIndexes = new Array();
     this.fields = new Array();
-    this.testValues = new Array();
+    this.testDatas = new Array();
     this.resultsManagers = new Array();
     this.baseNumTabs = currentNumTabs;
     this.testManager = null;
@@ -43,13 +43,13 @@ function TestRunnerContainer(currentNumTabs){
 
 TestRunnerContainer.prototype = {
     addTestRunner: function(testRunner, formPanel, formIndex, field, 
-            testValue, resultsManager)
+            testData, resultsManager)
     {
         this.testRunners.push(testRunner);
         this.formPanels.push(formPanel);
         this.formIndexes.push(formIndex);
         this.fields.push(field);
-        this.testValues.push(testValue);
+        this.testDatas.push(testData);
         this.resultsManagers.push(resultsManager);
     }
     ,
@@ -73,10 +73,10 @@ TestRunnerContainer.prototype = {
             var formPanel = this.formPanels.pop();
             var formIndex = this.formIndexes.pop();
             var field = this.fields.pop();
-            var testValue = this.testValues.pop();
+            var testData = this.testDatas.pop();
             var resultsManager = this.resultsManagers.pop();
             
-            testRunner.do_test(formPanel, formIndex, field, testValue, 
+            testRunner.do_test(formPanel, formIndex, field, testData, 
                     resultsManager, firstEmptyIndex+this.baseNumTabs);
             
         }
@@ -113,7 +113,7 @@ TestRunnerContainer.prototype = {
         this.formPanels.splice(0, this.formPanels.length);
         this.formIndexes.splice(0, this.formPanels.length);
         this.fields.splice(0, this.formPanels.length);
-        this.testValues.splice(0, this.formPanels.length);
+        this.testDatas.splice(0, this.formPanels.length);
         this.resultsManagers.splice(0, this.formPanels.length);
     }
     ,
