@@ -281,6 +281,7 @@ ResultsManager.prototype = {
         var unamedFieldCounter = 0;
         var testDataList = fieldResult.getSubmitState();
         var testedDataKey = null;
+        var stringEncoder = getHTMLStringEncoder();
         for each(var testData in testDataList) {
             if (testData.tested ===true){
                 testFieldName = (testData.name !== undefined ? testData.name : "unnamed field");
@@ -292,7 +293,7 @@ ResultsManager.prototype = {
         rv += "<b>Submitted Form State:</b><br /><ul>";
         for (var key in testDataList) {
             if (testDataList[key].tested === false){
-                rv += "<li>" + (testDataList[key].name ? testDataList[key].name : "unnamed field") + ": " + encodeString(testDataList[key].data)+ "</li>";
+                rv += "<li>" + (testDataList[key].name ? testDataList[key].name : "unnamed field") + ": " + stringEncoder.encodeString(testDataList[key].data)+ "</li>";
             }
             else {
                 testedDataKey = key;
@@ -317,12 +318,12 @@ ResultsManager.prototype = {
             rv += "Tested value: ";
             unamedFieldCounter = 0;
             if (testedDataKey) {
-                rv += encodeString(result.testData[testedDataKey].data);
+                rv += stringEncoder.encodeString(result.testData[testedDataKey].data);
             }
             else {
                 for each(var testData in result.testData) {
                     if (testData.tested === true){
-                        rv += encodeString(testData.data);
+                        rv += stringEncoder.encodeString(testData.data);
                         break;
                     }
                     else if (testData.name === undefined ) {

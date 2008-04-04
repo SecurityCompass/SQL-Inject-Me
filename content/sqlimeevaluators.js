@@ -35,15 +35,16 @@ function checkSrcForErrorString(streamListener) {
     var errorContainer = getErrorStringContainer();
     var results = new Array();
     var doc = streamListener.data;
+    var stringEncoder = getHTMLStringEncoder();
     dump("\nStart freeze...");
     for each (var error in errorContainer.getStrings()){
         var result;
         
         if (doc.indexOf(error.string) !== -1) {
-            result = new Result(RESULT_TYPE_ERROR, 100, "Error string found: '" + encodeString(error.string) + "'");
+            result = new Result(RESULT_TYPE_ERROR, 100, "Error string found: '" + stringEncoder.encodeString(error.string) + "'");
         }
         else {
-            result = new Result(RESULT_TYPE_PASS, 100, "Error string not found: '" + encodeString(error.string) + "'");
+            result = new Result(RESULT_TYPE_PASS, 100, "Error string not found: '" + stringEncoder.encodeString(error.string) + "'");
         }
         
         results.push(result);
@@ -62,15 +63,16 @@ function checkForErrorString(browser) {
     var errorContainer = getErrorStringContainer();
     var results = new Array();
     var doc = browser.contentDocument.toString();
+    var stringEncoder = getHTMLStringEncoder();
     dump("\nStart freeze...");
     for each (var error in errorContainer.getStrings()){
         var result;
         
         if (doc.indexOf(error.string) !== -1) {
-            result = new Result(RESULT_TYPE_ERROR, 100, "Error string found: '" + encodeString(error.string) + "'");
+            result = new Result(RESULT_TYPE_ERROR, 100, "Error string found: '" + stringEncoder.encodeString(error.string) + "'");
         }
         else {
-            result = new Result(RESULT_TYPE_PASS, 100, "Error string not found: '" + encodeString(error.string) + "'");
+            result = new Result(RESULT_TYPE_PASS, 100, "Error string not found: '" + stringEncoder.encodeString(error.string) + "'");
         }
         
         results.push(result);
@@ -82,6 +84,7 @@ function checkForErrorString(browser) {
 }
 
 function checkForServerResponseCode(nsiHttpChannel){
+    var stringEncoder = getHTMLStringEncoder();
     try{
         if ((nsiHttpChannel.responseStatus === undefined || nsiHttpChannel.responseStatus === null)){
             return null;   
@@ -89,8 +92,8 @@ function checkForServerResponseCode(nsiHttpChannel){
         else {
             var result;
             var responseCode = nsiHttpChannel.responseStatus;
-            var displayString = "Server Status Code: " + encodeString(responseCode.toString()) + " " +
-                    encodeString(nsiHttpChannel.responseStatusText);
+            var displayString = "Server Status Code: " + stringEncoder.encodeString(responseCode.toString()) + " " +
+                    stringEncoder.encodeString(nsiHttpChannel.responseStatusText);
             if (responseCode == 200){
                 result = new Result(RESULT_TYPE_PASS, 100, displayString );
             }
