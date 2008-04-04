@@ -31,3 +31,6 @@ tools@securitycompass.com
 }
 
 
+#generatingReport {
+    visibility: collapse;
+}
