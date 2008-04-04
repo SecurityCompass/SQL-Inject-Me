@@ -63,7 +63,7 @@ FieldResult.prototype = {
         }
     }
     ,
-    count: function(){
+    getLength: function(){
         var numTestsRun = 0; 
         var numPasses = 0; 
         var numWarnings = 0;

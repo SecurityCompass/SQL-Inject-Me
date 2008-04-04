@@ -628,6 +628,16 @@ extension.prototype = {
     }
     ,
     /**
+     * Notify's the warningDialog (if it exists) that it should change its
+     * state to notify them 
+     */
+    generatingReport: function(){
+        if (this.warningDialog && this.warningDialog.closed === false) {
+            this.warningDialog.generatingReport();
+        }
+    }
+    ,
+    /**
      * Called by the testmanager and resultsmanager to report that a test has
      * been completed so that the popup's UI can be updated
      */

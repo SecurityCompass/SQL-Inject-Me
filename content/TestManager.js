@@ -247,10 +247,18 @@ TestManager.prototype = {
             }
             dump('\ndone now.')
             getTestRunnerContainer().clearWorkTabs();
+            this.controller.generatingReport();
             this.resultsManager.showResults(this);
-            this.controller.postTest();
+            
         }
         
+    }
+    ,
+    /**
+     * postReport is called after the report is generated
+     */
+    postReport: function() {
+        this.controller.postTest();
     }
     ,
     /**

@@ -38,7 +38,7 @@ tools@securitycompass.com
 -->
     <script type="application/x-javascript;version=1.7"
         src="chrome://sqlime/content/whiletestruns.js" />
-    <vbox flex="1">
+    <vbox flex="1" id="duringTest">
         <vbox flex="1" id='heuristicTestingBox'>
             <label value='Probing for XSS Vulnerabilities: ' />
             <description><xhtml:span id='heuristicTestCount'></xhtml:span> Tests Run
@@ -51,5 +51,9 @@ tools@securitycompass.com
             </description>
             <progressmeter id='thoroughBar' mode="determined" />
         </vbox>
+    </vbox>
+    <vbox flex="1" id="generatingReport">
+        <label value="Generating Report" />
+        <progressmeter id="generatingReportBar" mode="undetermined" />
     </vbox>
 </dialog>

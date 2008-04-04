@@ -111,3 +111,8 @@ function onLoad() {
     //update UI every 1/5 second
     window.setInterval(this.updateUI, 200);
 }
+
+function generatingReport() {
+    document.getElementById('duringTest').style.visibility = 'collapse';
+    document.getElementById('generatingReport').style.visibility = 'visible';
+}
