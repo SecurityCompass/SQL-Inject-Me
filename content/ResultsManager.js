@@ -280,6 +280,7 @@ ResultsManager.prototype = {
         rv += "<div class='result'>";
         var unamedFieldCounter = 0;
         var testDataList = fieldResult.getSubmitState();
+        var testedDataKey = null;
         for each(var testData in testDataList) {
             if (testData.tested ===true){
                 testFieldName = (testData.name !== undefined ? testData.name : "unnamed field");
@@ -289,13 +290,12 @@ ResultsManager.prototype = {
         rv += "<div class='field'>" + (testFieldName?testFieldName:'unnamed field') + "</div>";
         rv += "<div class='submitted'>";
         rv += "<b>Submitted Form State:</b><br /><ul>";
-        unamedFieldCounter = 0;
-        for each(var testData in testDataList) {
-            if (testData.tested === false){
-                rv += "<li>" + (testData.name ? testData.name : "unnamed field") + ": " + encodeString(testData.data)+ "</li>";
+        for (var key in testDataList) {
+            if (testDataList[key].tested === false){
+                rv += "<li>" + (testDataList[key].name ? testDataList[key].name : "unnamed field") + ": " + encodeString(testDataList[key].data)+ "</li>";
             }
-            else if (testData.name === undefined) {
-                unamedFieldCounter++;
+            else {
+                testedDataKey = key;
             }
         }
         rv += "</ul></div>";
@@ -316,13 +316,18 @@ ResultsManager.prototype = {
             rv += result.message+"<br />"
             rv += "Tested value: ";
             unamedFieldCounter = 0;
-            for each(var testData in result.testData) {
-                if (testData.tested === true){
-                    rv += encodeString(testData.data);
-                    break;
-                }
-                else if (testData.name === undefined ) {
-                    unamedFieldCounter++;
+            if (testedDataKey) {
+                rv += encodeString(result.testData[testedDataKey].data);
+            }
+            else {
+                for each(var testData in result.testData) {
+                    if (testData.tested === true){
+                        rv += encodeString(testData.data);
+                        break;
+                    }
+                    else if (testData.name === undefined ) {
+                        unamedFieldCounter++;
+                    }
                 }
             }
             rv += "</div>"
@@ -397,12 +402,33 @@ ResultsManager.prototype = {
     /**
      * Asynchronous recursive function which generates the body of the report.
      * @param sortedResults The sorted results
+     * @param errorstr an error string (used if report generation failed and and error needs to be shown)
+     * @param timeout used by setTimeout() (undefined for first call)
+     * @param resultIndex used to keep track of which fieldResult we need to generate results for now (undefined for first call)
      */
-    generateBodyOfReport: function(sortedResults, errorstr){
-        for each(var fieldResult in sortedResults) {
-              this.results += this.showFieldResult(fieldResult);
+    generateBodyOfReport: function(sortedResults, errorstr, timeout, resultIndex){
+
+        if (timeout === undefined){
+            var prefService = Components.
+                        classes['@mozilla.org/preferences-service;1'].
+                        getService(Components.interfaces.nsIPrefService);
+            var branch = prefService.getBranch("extensions.sqlime.");
+            
+            timeout = branch.getIntPref('reportbuilding.timeout');
         }
-        this.generateEndOfReport(sortedResults, errorstr);
+        
+        if (resultIndex === undefined) {
+            resultIndex = 0;
+        }
+        
+        if (resultIndex < sortedResults.length) {
+            this.results += this.showFieldResult(sortedResults[resultIndex]);
+            setTimeout(generateMoreOfReportBody, timeout, this, sortedResults,
+                    errorstr, timeout, resultIndex+1);
+        }
+        else {
+            this.generateEndOfReport(sortedResults, errorstr);
+        }
     }
     ,
     /**
@@ -637,6 +663,6 @@ ResultsManager.prototype = {
     }
 };
 
-function generateMoreOfReportBody(resultsManager, soretedResults) {
-    resultsManager.generateBodyOfReport(sortedResults);
+function generateMoreOfReportBody(resultsManager, sortedResults, errorstr, timeout, resultIndex) {
+    resultsManager.generateBodyOfReport(sortedResults, errorstr, timeout, resultsManager);
 }
