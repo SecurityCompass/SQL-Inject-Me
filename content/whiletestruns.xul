@@ -40,13 +40,13 @@ tools@securitycompass.com
         src="chrome://sqlime/content/whiletestruns.js" />
     <vbox flex="1" id="duringTest">
         <vbox flex="1" id='heuristicTestingBox'>
-            <label value='Probing for XSS Vulnerabilities: ' />
+            <label value='Probing for SQL Injection Vulnerabilities: ' />
             <description><xhtml:span id='heuristicTestCount'></xhtml:span> Tests Run
             </description>
             <progressmeter id='heuristicBar' mode='determined'/>
         </vbox>
         <vbox flex="1">
-            <label value='Testing with XSS Strings:' />
+            <label value='Testing with SQL Injection Strings:' />
             <description><xhtml:span id='thoroughTestCount'>0/TBD</xhtml:span> Tests Run
             </description>
             <progressmeter id='thoroughBar' mode="determined" />
