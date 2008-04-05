@@ -464,7 +464,7 @@ ResultsManager.prototype = {
         foStream.init(file, 0x02 | 0x08 | 0x20, 0666, 0); // write, create, truncate
         foStream.write(this.results, this.results.length);
         foStream.close();
-
+        this.results="";
         
         resultsTab = getMainWindow().getBrowser().
                 addTab(file.path);
@@ -664,6 +664,9 @@ ResultsManager.prototype = {
     }
 };
 
-function generateMoreOfReportBody(resultsManager, sortedResults, errorstr, timeout, resultIndex) {
-    resultsManager.generateBodyOfReport(sortedResults, errorstr, timeout, resultsManager);
+function generateMoreOfReportBody(resultsManager, sortedResults, errorstr,
+        timeout, resultIndex)
+{
+    resultsManager.generateBodyOfReport(sortedResults, errorstr, timeout,
+            resultIndex);
 }
