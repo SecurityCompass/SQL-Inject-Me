@@ -196,8 +196,7 @@ extension.prototype = {
             return;
         }
         else {
-            testCount = fieldsToTest.length * testType.count * 2;
-            // *2 is to signify the number of evaluators that are registered
+            testCount = fieldsToTest.length * testType.count;
         }
         
         this.warningDialog = window.openDialog(
