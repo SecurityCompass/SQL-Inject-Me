@@ -34,6 +34,11 @@ function AttackRunner(){
 
     this.className = "AttackRunner";
     /**
+     * a reference to the nsIHttpChannel being used by this
+     */
+    this.channel = null;
+    
+    /**
      * uniqueID is important for heuristic tests which need a random string in
      * order to find the char they sent
      */
@@ -85,137 +90,18 @@ AttackRunner.prototype = {
         {
             formData = tabManager.getFormDataForURL(mainBrowser.
                     contentDocument.forms,  formIndex, field.index, 
-                    testData);
+                    testData.string);
         }
         else 
         {
             formData = tabManager.getFormDataForURL(mainBrowser.
-                    contentDocument.forms,  formIndex, null, null);
+                    contentDocument.forms,  formIndex, null, testData.string);
         }
         this.testData = tabManager.getTabData(mainBrowser.
                     contentDocument.forms,  formIndex, field.index, testData.string);
-
-        
         dump('\ndoing source test...');
         this.do_source_test(formIndex, formIndex, field, testData,
                 resultsManager, mainBrowser,formData);
-
-        
-        function afterWorkTabStopped(){
-            browser.addEventListener('pageshow',
-                    afterWorkTabHasLoaded, false);
-            
-            //this also moves worktab to the same page as the currentTab
-            var count = currentTab.linkedBrowser.sessionHistory.count;
-            if (count) {
-                var currentEntry = currentTab.linkedBrowser.sessionHistory.getEntryAtIndex((count-1), false);
-                var postData = null;
-                if (currentEntry.postData) {
-                    var postDataStream = Components.classes["@mozilla.org/scriptableinputstream;1"].
-                            createInstance(Components.interfaces.nsIScriptableInputStream);
-                    
-                    postDataStream.init(currentEntry.postData);
-                    
-                    while (true) {
-                        var foo = postDataStream.read(512);
-                        if (foo) {
-                            postData += foo;
-                        }
-                        else {
-                            break;
-                        }
-                    }
-                }
-                
-                browser.webNavigation.loadURI(currentEntry.URI.spec, 0, (currentEntry.referrerURI?currentEntry.referrerURI:null), postData, null); 
-            }
-            else {
-                browser.webNavigation.loadURI(currentTab.linkedBrowser.webNavigation.currentURI.spec, 0, null, null, null);
-            }
-            
-        }
-        
-        function afterWorkTabHasLoaded(event) {
-            dump('start afterWorkTabHasLoaded\n');
-            var formData = null;
-            browser.removeEventListener('pageshow', 
-                    afterWorkTabHasLoaded, false);
-            
-            var loadSuccessful = compareContentDocuments(currentTab.linkedBrowser.contentDocument, browser.contentDocument)
-            
-            if (loadSuccessful === false) {
-                getTestManager().cannotRunTests();
-                return
-            }
-            
-            //this will copy all the form data...
-            try { 
-                if (field)
-                {
-                    tabManager.writeTabForms(browser.contentDocument.
-                            forms,  formIndex, field.index, testData);
-                    formData = tabManager.getFormDataForURL(browser.
-                            contentDocument.forms,  formIndex, field.index, 
-                            testData);
-                }
-                else 
-                {
-                    tabManager.writeTabForms(browser.contentDocument.
-                            forms,  formIndex, null, null);
-                    formData = tabManager.getFormDataForURL(browser.
-                            contentDocument.forms,  formIndex, null, null);
-                }
-            }
-            catch(e) {
-                Components.utils.reportError(e + " " + (browser.webNavigation.currentURI?browser.webNavigation.currentURI.spec:"null"))
-            }
-            dump('AttackRunner::afterWorkTabHasLoaded  testData===' + testData + '\n')
-            
-            self.testData = tabManager.getTabData(browser.
-                    contentDocument.forms,  formIndex, field.index);
-            dump('attackRunner::testData == ' + this.testData + '\n');
-            dump('tab data should be written now\n');
-            
-            if (window.navigator.platform.match("win", "i")) {
-                browser.addEventListener('pageshow', 
-                        afterWorkTabHasSubmittedAndLoaded, false);
-            }
-            else {
-                setTimeout(function(){browser.addEventListener('pageshow', 
-                        afterWorkTabHasSubmittedAndLoaded, false)}, 1);
-            }
-                    
-            if (resultsManager)
-            {
-                browser.addEventListener('pageshow', 
-                        afterWorkTabHasSubmittedAndLoaded, false); 
-                           
-                var observerService = Components.
-                        classes['@mozilla.org/observer-service;1'].
-                        getService(Components.interfaces.nsIObserverService);
-
-                var attackHttpResponseObserver = 
-                        new AttackHttpResponseObserver(self, resultsManager);
-
-                resultsManager.addObserver(attackHttpResponseObserver);
-                observerService.addObserver(attackHttpResponseObserver, 
-                        AttackHttpResponseObserver_topic, false);
-                
-            }
-            var formGotSubmitted = self.submitForm(
-                    browser, formIndex);
-            dump('end afterWorkTabHasLoaded '+ formGotSubmitted +'\n');
-     
-        }
-        
-        //this should fire only *after* the form has been sumbitted and the new
-        //page has loaded.
-        function afterWorkTabHasSubmittedAndLoaded(event){
-            browser.removeEventListener('pageshow', afterWorkTabHasSubmittedAndLoaded, false);
-            
-            setTimeout(callEvaluate, 1, browser, self, resultsManager)
-            
-        }
         
     }
     ,
@@ -243,8 +129,8 @@ AttackRunner.prototype = {
         
         var uri = ioService.newURI(formAction, null, null);
         var referingURI = ioService.newURI(formURL, null, null);
-        var channel = ioService.newChannelFromURI(uri);
-        channel.QueryInterface(Components.interfaces.nsIHttpChannel).
+        this.channel = ioService.newChannelFromURI(uri);
+        this.channel.QueryInterface(Components.interfaces.nsIHttpChannel).
                 referrer = referingURI;
         
         if (form.method.toLowerCase() == 'post'){
@@ -252,16 +138,16 @@ AttackRunner.prototype = {
                     classes['@mozilla.org/io/string-input-stream;1'].
                     createInstance(Components.interfaces.nsIStringInputStream);
             inputStream.setData(formData, formData.length);
-            channel.QueryInterface(Components.interfaces.nsIUploadChannel).
+           this.channel.QueryInterface(Components.interfaces.nsIUploadChannel).
                     setUploadStream(inputStream, 
                     'application/x-www-form-urlencoded', -1);
-            channel.QueryInterface(Components.interfaces.nsIHttpChannel).
+           this.channel.QueryInterface(Components.interfaces.nsIHttpChannel).
                     requestMethod = 'POST';
         }
         
         var streamListener = new StreamListener(this, resultsManager);
         streamListener.testData = this.testData;
-        channel.asyncOpen(streamListener, null);
+       this.channel.asyncOpen(streamListener, null);
     }
 }
 
