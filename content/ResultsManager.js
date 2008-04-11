@@ -273,7 +273,12 @@ ResultsManager.prototype = {
 
     }
     ,
-    showFieldResult: function(fieldResult){
+    /**
+     * returns a string with the (html formatted) results for a given field
+     * @param fieldResult the fieldResult for a given page
+     * @param showPass whether to show pass results
+     */
+    showFieldResult: function(fieldResult, showPass){
         fieldResult.sort();
         var rv ="";
         var testFieldName;
@@ -282,6 +287,7 @@ ResultsManager.prototype = {
         var testDataList = fieldResult.getSubmitState();
         var testedDataKey = null;
         var stringEncoder = getHTMLStringEncoder();
+        var passCount = 0;
         for each(var testData in testDataList) {
             if (testData.tested ===true){
                 testFieldName = (testData.name !== undefined ? testData.name : "unnamed field");
@@ -302,9 +308,14 @@ ResultsManager.prototype = {
         rv += "</ul></div>";
         rv += "<div class='outcome'><b>Results:</b><br />";
         for each(var result in fieldResult.results) {
-            
             switch (result.type){
                 case RESULT_TYPE_PASS:
+                    if (showPass === false) {
+                        passCount++;
+                        continue; /* ugly, I know. But keeps this check being
+                                    done only when it has to be. valuable since
+                                    we're dealing with big values of N */
+                    }
                     rv += "<div class='pass'>"
                     break;
                 case RESULT_TYPE_WARNING:
@@ -333,6 +344,12 @@ ResultsManager.prototype = {
             }
             rv += "</div>"
             
+        }
+        if (showPass === false && passCount > 0) {
+            rv += "<div class='pass'>";
+            rv += "This field passed " + passCount +
+                    " tests. To see all the passed results, go to Tools->SQL Inject Me->Options and click 'Show passed results in final report' and rerun this test."
+            rv += "</div>";
         }
         rv += '</div>';
         rv += "</div>";
@@ -372,7 +389,13 @@ ResultsManager.prototype = {
         var numTestsRun = 0; 
         var numPasses = 0; 
         var numWarnings = 0;
-        var numFailes = 0; 
+        var numFailes = 0;
+        
+        var prefService = Components.classes['@mozilla.org/preferences-service;1'].
+            getService(Components.interfaces.nsIPrefService);
+        var branch = prefService.getBranch('extensions.sqlime.reportbuilding.')
+        
+        this.showPasses = branch.getBoolPref('showPass');
         
         [numTestsRun, numFailes, numWarnings, numPasses] = this.count();
         
@@ -423,7 +446,7 @@ ResultsManager.prototype = {
         }
         
         if (resultIndex < sortedResults.length) {
-            this.results += this.showFieldResult(sortedResults[resultIndex]);
+            this.results += this.showFieldResult(sortedResults[resultIndex], this.showPasses);
             setTimeout(generateMoreOfReportBody, timeout, this, sortedResults,
                     errorstr, timeout, resultIndex+1);
         }

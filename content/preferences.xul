@@ -38,11 +38,15 @@ tools@securitycompass.com
                         name="extensions.sqlime.numtabstouse"
                         type="int"/>
             <preference id="prefSidebarBuildingPause"
-						name="extensions.sqlime.sidebarbuildingstop"
-						type="int" />
+			name="extensions.sqlime.sidebarbuildingstop"
+			type="int" />
+	    <preference id="prefReportBuildingShowPass"
+			name="extensions.sqlime.reportbuilding.showPass"
+			type="bool" />
         </preferences>
-        <checkbox label="Show Context Menu" preference="showContextMenu" />
-        <label value="Preferred Number of Attacks to Test" control="preferedNumAttacksTxtBox" />
+        <checkbox label="Show 'Open Sidebar' in context menu" preference="showContextMenu" />
+	<checkbox label="Show passed results in final report (Warning: long reports will cause heavy cpu load)" preference="prefReportBuildingShowPass" />
+        <label value="Preferred number of attacks to test" control="preferedNumAttacksTxtBox" />
         <textbox id="preferedNumAttacksTxtBox" preference="preferedNumAttacks" />
         <label value="Number of tabs to use for testing" control="preferednumtabs" />
         <textbox id="preferednumtabs" preference="numtabstouse" />
@@ -50,9 +54,9 @@ tools@securitycompass.com
                tooltip='tipSidebarBuildingPause'
 			   control="txtSidebarBuildingPause"
                crop="end" />
-		<textbox id="txtSidebarBuildingPause"
-                 preference="prefSidebarBuildingPause"
-                 tooltip='tipSidebarBuildingPause' />
+	<textbox id="txtSidebarBuildingPause"
+	 preference="prefSidebarBuildingPause"
+	 tooltip='tipSidebarBuildingPause' />
     </prefpane>
     <prefpane label="SQL Injection Strings" id="sqlistrings">
         <preferences>
