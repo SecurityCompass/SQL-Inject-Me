@@ -83,7 +83,8 @@ function checkForErrorString(browser) {
     return results;
 }
 
-function checkForServerResponseCode(nsiHttpChannel){
+function checkForServerResponseCode(streamListener){
+    var nsiHttpChannel = streamListener.attackRunner.channel;
     var stringEncoder = getHTMLStringEncoder();
     try{
         if ((nsiHttpChannel.responseStatus === undefined || nsiHttpChannel.responseStatus === null)){

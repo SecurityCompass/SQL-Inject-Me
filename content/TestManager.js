@@ -168,6 +168,7 @@ TestManager.prototype = {
         
         this.resultsManager.addEvaluator(checkForErrorString);
         this.resultsManager.addSourceEvaluator(checkSrcForErrorString);
+        this.resultsManager.addSourceEvaluator(checkForServerResponseCode);
         
         getTestRunnerContainer().clear();
         var testStrings = getAttackStringContainer().getStrings();
