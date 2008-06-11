@@ -75,7 +75,8 @@ tools@securitycompass.com
         <command id="sqlime_generate_form_ui" oncommand="setTimeout(function(){sqlimeExtension.do_generate_form_ui()}, 1);" />
         <command id="sqlime_do_test" oncommand="sqlimeExtension.run_tests(event)" />
     </commandset>
-    <box><image src="chrome://sqlime/skin/small_logo_sc.png" /> </box>
+    <box>        <html:a href="http://www.securitycompass.com" target="securitycompasssite">
+<image src="chrome://sqlime/skin/small_logo_sc.png" /> </html:a></box>
     <label style="font-size: xx-large" class="title">SQL Inject Me</label>
     <vbox style="overflow:auto;" flex="1">
         <description>
