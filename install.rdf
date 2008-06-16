@@ -9,7 +9,6 @@
     <em:description>An extension to test for SQL injection vulnerabilities</em:description>
     <em:optionsURL>chrome://sqlime/content/preferences.xul</em:optionsURL>
     <em:iconURL>chrome://sqlime/skin/tiny_logo.png</em:iconURL>
-    <em:updateURL>http://www.securitycompass.com/sqlime/update.rdf</em:updateURL>
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- firefox -->
