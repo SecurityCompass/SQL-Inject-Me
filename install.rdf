@@ -3,8 +3,8 @@
  xmlns:em="http://www.mozilla.org/2004/em-rdf#">
   <Description about="urn:mozilla:install-manifest">
     <em:id>sqlime@security.compass</em:id>
-    <em:name>SQL Inejct Me</em:name>
-    <em:version>0.2.0</em:version>
+    <em:name>SQL Inject Me</em:name>
+    <em:version>trunk</em:version>
     <em:creator>Security Compass</em:creator>
     <em:description>An extension to test for SQL injection vulnerabilities</em:description>
     <em:optionsURL>chrome://sqlime/content/preferences.xul</em:optionsURL>
@@ -13,7 +13,7 @@
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- firefox -->
         <em:minVersion>2.0.0.9</em:minVersion>
-        <em:maxVersion>2.0.0.*</em:maxVersion>
+        <em:maxVersion>3.0.*</em:maxVersion>
       </Description>
     </em:targetApplication>
   </Description>

@@ -29,7 +29,7 @@ tools@securitycompass.com
   <box>        <html:a href="http://www.securitycompass.com" target="securitycompasssite">
 <image src="chrome://sqlime/skin/logo_sc.png" /> </html:a></box> 
   <text value="SQL Inject Me" style="font-weight: bold; font-size: x-large;"/>
-  <text value="Beta 1"/>
+  <text value="Trunk"/>
   <separator class="thin"/>
   <text value="Created By" style="font-weight: bold;"/>
   <text value="Security Compass"/>
