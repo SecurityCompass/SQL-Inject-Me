@@ -42,8 +42,8 @@ const __sqli_me_prefs_to_disable = [
         {"name": "security.warn_submit_insecure", "type":"bool", "ourValue": false},
         {"name": "security.warn_viewing_mixed", "type":"bool", "ourValue": false},
         {"name": "dom.max_chrome_script_run_time", "type":"int", "ourValue": 0},
-        {"name": "signon.prefillForms", "type":"bool", "ourValue":false},
-        {"name": "signon.rememberSignons", "type":"bool", "ourValue":false},
+        {"name": "signon.autofillForms", "type":"bool", "ourValue":false}, /* to remove autofilling forms in Fx3 */
+        {"name": "signon.prefillForms", "type":"bool", "ourValue":false}, /* same as above but for Fx2 */        {"name": "signon.rememberSignons", "type":"bool", "ourValue":false},
         {"name": "accessibility.typeaheadfind.enablesound", "type":"bool", "ourValue":false}
         ];
  
@@ -560,14 +560,15 @@ extension.prototype = {
                         break;
                 }
                 
-                if (errorState) break;
+                if (!errorState) {
                 
-                var backupPref = {
-                        'name': prefInfo.name,
-                        'type': prefInfo.type,
-                        'origValue': origValue};
-                
-                this.prefs.push(backupPref);
+                    var backupPref = {
+                            'name': prefInfo.name,
+                            'type': prefInfo.type,
+                            'origValue': origValue};
+                    
+                    this.prefs.push(backupPref);
+                }
             }
             
         }
