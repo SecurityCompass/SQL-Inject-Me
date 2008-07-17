@@ -45,9 +45,9 @@ SidebarBuilder.prototype = {
             
             var parent, child, postFunc;
             
-            [parent, child, postFunc] = self.toBeAdded.shift();
+            [parent, child, postFunc] = self.toBeAdded.pop();
             
-            dump('\nAdding '+child+' -> '+parent);
+            dump('\nAdding '+child+'('+ child.nodeName+') -> '+parent + '('+parent.nodeName+')');
             
             parent.appendChild(child);
             

@@ -225,14 +225,17 @@ extension.prototype = {
      
         runTests_mi.setAttribute('label', "Run all tests");
         runTests_mi.setAttribute('value', TestType_AllTestsForForm);
+        runTests_mi.setAttribute('selected', TestType_AllTestsForForm);
+
         runTopTests_mi.setAttribute('label', "Run top " + this.
                 getPreferredNumberOfAttacks() + " tests");
         runTopTests_mi.setAttribute('value', TestType_PrefNumTestsForForm);
         
+        
         submitThisForm_mi.setAttribute('value', TestType_OneTestForForm);
         
-        rv.menuitems.push(runTests_mi);
         rv.menuitems.push(runTopTests_mi);
+        rv.menuitems.push(runTests_mi);
      
          //menulist.setAttribute("editable", false);
         rv.menupopup= menupopup;
@@ -297,6 +300,7 @@ extension.prototype = {
         var tabs = document.createElement('tabs');
         var tabpanels = document.createElement('tabpanels');
         var fieldsLabel = document.createElement('label');
+        var sidebarBuilder = getSidebarBuilder();
         fieldsLabel.setAttribute('value', "These are the fields in this form:");
         
         tabbox.setAttribute('id', 'sidebarformtabbox');
@@ -306,9 +310,7 @@ extension.prototype = {
                 box.removeChild(box.childNodes[i]);
             }
         }
-        
-        getSidebarBuilder().add(box, tabbox);
-
+    
         // create the form UI
         // Note that the addition of the DOM is seperated from the creation of 
         // it in the hopes that it will make for a faster overall operation 
@@ -390,45 +392,56 @@ extension.prototype = {
             
             }
             
+            /* the order of the below is very important. If the order is
+              changed then not only will the display change but some things
+              will break (certain attributes are checked only by grandparents
+              on addition to the DOM, ex. selected). */
+            
             //Add the form UI to the DOM.
             for (var i =0; i < newTabs.length; i++) {
                 //newTabPanelVbox[i].appendChild(fieldsLabel.cloneNode(true));
                 for each(var fieldUI in newTabForms[i]) {
                     //dump(q++ + 'appending ui :' + fieldUI + '\n');
                     //newTabPanelVbox[i].appendChild(fieldUI);
-                    getSidebarBuilder().add(newTabPanelVbox[i], fieldUI);
+                    sidebarBuilder.add(newTabPanelVbox[i], fieldUI, selectFirstMenuItemForField);
                 }
+                
+                //newTabActions[i].menulist.appendChild(newTabActions[i].
+                //        menupopup);
+
+                /* the order from here ...*/
+                //newTabActions[i].box.appendChild(newTabActions[i].menulist);
+                sidebarBuilder.add(newTabActions[i].box,
+                        newTabActions[i].menulist);
+                
+                sidebarBuilder.add(newTabActions[i].menulist,
+                        newTabActions[i].menupopup);
                 
                 for each(var mi in newTabActions[i].menuitems){
                     //newTabActions[i].menupopup.appendChild(mi);
-                    getSidebarBuilder().add(newTabActions[i].menupopup, mi);
+                    sidebarBuilder.add(newTabActions[i].menupopup, mi);
                 }
-                //newTabActions[i].menulist.appendChild(newTabActions[i].
-                //        menupopup);
-                getSidebarBuilder().add(newTabActions[i].menulist,
-                        newTabActions[i].menupopup);
                 
-                //newTabActions[i].box.appendChild(newTabActions[i].menulist);
-                getSidebarBuilder().add(newTabActions[i].box,
-                        newTabActions[i].menulist);
+                /* to here is particularly crucial and annoying */
+                
                 //newTabActions[i].box.appendChild(newTabActions[i].button);
-                getSidebarBuilder().add(newTabActions[i].box,
+                sidebarBuilder.add(newTabActions[i].box,
                         newTabActions[i].button);
                 //newTabPanelVbox[i].appendChild(newTabActions[i].box);
-                getSidebarBuilder().add(newTabPanelVbox[i],
+                sidebarBuilder.add(newTabPanelVbox[i],
                         newTabActions[i].box);
                 //newTabPanels[i].appendChild(newTabPanelVbox[i]);
-                getSidebarBuilder().add(newTabPanels[i], newTabPanelVbox[i]);
+                sidebarBuilder.add(newTabPanels[i], newTabPanelVbox[i]);
                 //tabs.appendChild(newTabs[i]);
-                getSidebarBuilder().add(tabs, newTabs[i]);
+                sidebarBuilder.add(tabs, newTabs[i]);
                 //tabpanels.appendChild(newTabPanels[i]);
-                getSidebarBuilder().add(tabpanels, newTabPanels[i]);
+                sidebarBuilder.add(tabpanels, newTabPanels[i]);
             }
             
-            //tabbox.appendChild(tabs);
-            getSidebarBuilder().add(tabbox, tabs);
             //tabbox.appendChild(tabpanels);
-            getSidebarBuilder().add(tabbox, tabpanels, ensureFirstTabPanelIsSelected);
+            sidebarBuilder.add(tabbox, tabpanels);
+            //tabbox.appendChild(tabs);
+            sidebarBuilder.add(tabbox, tabs);
             
         }
         else {
@@ -442,26 +455,30 @@ extension.prototype = {
             
             noformTab.setAttribute("label", "No Forms");
             
-            //tabbox.appendChild(tabs);
-            getSidebarBuilder().add(tabbox, tabs);
-            //tabbox.appendChild(tabpanels);
-            getSidebarBuilder().add(tabbox, tabpanels);
+
+
             
             //tabs.appendChild(noformTab);
-            getSidebarBuilder().add(tabs, noformTab);
+            sidebarBuilder.add(tabs, noformTab);
             
             //tabpanels.appendChild(noformPanel);
-            getSidebarBuilder().add(tabpanels, noformPanel);
+            sidebarBuilder.add(tabpanels, noformPanel);
             
             //noformPanel.appendChild(noformPanelVbox);
-            getSidebarBuilder().add(noformPanel, noformPanelVbox);
+            sidebarBuilder.add(noformPanel, noformPanelVbox);
             
             //noformPanelVbox.appendChild(labelinpanel);
-            getSidebarBuilder().add(noformPanelVbox, labelinpanel);
-            
+            sidebarBuilder.add(noformPanelVbox, labelinpanel);
+                               //tabbox.appendChild(tabpanels);
+            sidebarBuilder.add(tabbox, tabpanels);     
+                        //tabbox.appendChild(tabs);
+            sidebarBuilder.add(tabbox, tabs);
+
         }
         
-        getSidebarBuilder().start();
+        sidebarBuilder.add(box, tabbox);
+
+        sidebarBuilder.start();
         
     }
     ,
@@ -725,6 +742,7 @@ function createFieldUI(node, elementIndex){
     
     var menulist = document.createElement("menulist");
     menulist.setAttribute("editable", true);
+
     dump("creating field ui.......\n");
     var menupopup = document.createElement("menupopup");
     
@@ -736,6 +754,8 @@ function createFieldUI(node, elementIndex){
         firstMenuItem.setAttribute("label",
             "Change this to the value you want tested");
     }
+    firstMenuItem.setAttribute("selected", true);
+    
     menupopup.appendChild(firstMenuItem);
     
     dump("creating field ui............................\n");
@@ -751,6 +771,7 @@ function createFieldUI(node, elementIndex){
     }
     
     menulist.appendChild(menupopup);
+    menulist.selectedIndex = 0;
     
     hbox.appendChild(checkbox);
     hbox.appendChild(menulist);
@@ -792,7 +813,6 @@ function watchSidebarBuilderPausePref(subject, topic, data) {
     
     getSidebarBuilder().time = branch.getIntPref('sidebarbuildingstop');
 }
-
 /**
  * This function is used to make sure that the first tab panel is selected
  * in a tabbox
@@ -800,5 +820,31 @@ function watchSidebarBuilderPausePref(subject, topic, data) {
  * @param child the tabpanels element
  */
 function ensureFirstTabPanelIsSelected(parent, child) {
-   parent.selectedIndex= parent._tabpanels.selectedIndex = 0;
+    parent.selectedIndex= parent._tabpanels.selectedIndex = 0;
+}
+
+/**
+ * This function is used to make sure that first child of the menu drop down
+ * box.
+ * @param parent
+ * @param child menu list box.
+ */
+function ensureFirstChildOfMenuBox(parent, child) {
+    parent.selectedIndex = 0;
+    dump('changing index.\n')
+}
+
+/**
+ * Selects the first item in a menubox. Used with the retun value of
+ * createFieldUI.
+ * @param parent
+ * @param child the groupbox holding a field's UI as returned by createFieldUI()
+ */
+function selectFirstMenuItemForField(parent, child) {
+ 
+    dump("child.childNodes[1].childNodes[1].selectedIndex" + child.childNodes[1].childNodes[1].selectedIndex + " " + typeof(child.childNodes[1].childNodes[1].selectedIndex) + " "+ child.childNodes[1].childNodes[1].nodeName + "\n");
+    child.childNodes[1].childNodes[1].selectedIndex = 1;
+    dump("child.childNodes[1].childNodes[1].selectedIndex" + child.childNodes[1].childNodes[1].selectedIndex + " " + typeof(child.childNodes[1].childNodes[1].selectedIndex) + " "+ child.childNodes[1].childNodes[1].nodeName + "\n");
+    dump('changing fieldUI Index\n')
+ 
 }
