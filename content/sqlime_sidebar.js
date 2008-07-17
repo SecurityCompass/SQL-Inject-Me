@@ -399,18 +399,12 @@ extension.prototype = {
             
             //Add the form UI to the DOM.
             for (var i =0; i < newTabs.length; i++) {
-                //newTabPanelVbox[i].appendChild(fieldsLabel.cloneNode(true));
+
                 for each(var fieldUI in newTabForms[i]) {
-                    //dump(q++ + 'appending ui :' + fieldUI + '\n');
-                    //newTabPanelVbox[i].appendChild(fieldUI);
                     sidebarBuilder.add(newTabPanelVbox[i], fieldUI, selectFirstMenuItemForField);
                 }
-                
-                //newTabActions[i].menulist.appendChild(newTabActions[i].
-                //        menupopup);
 
                 /* the order from here ...*/
-                //newTabActions[i].box.appendChild(newTabActions[i].menulist);
                 sidebarBuilder.add(newTabActions[i].box,
                         newTabActions[i].menulist);
                 
@@ -424,23 +418,17 @@ extension.prototype = {
                 
                 /* to here is particularly crucial and annoying */
                 
-                //newTabActions[i].box.appendChild(newTabActions[i].button);
                 sidebarBuilder.add(newTabActions[i].box,
                         newTabActions[i].button);
-                //newTabPanelVbox[i].appendChild(newTabActions[i].box);
                 sidebarBuilder.add(newTabPanelVbox[i],
                         newTabActions[i].box);
-                //newTabPanels[i].appendChild(newTabPanelVbox[i]);
                 sidebarBuilder.add(newTabPanels[i], newTabPanelVbox[i]);
-                //tabs.appendChild(newTabs[i]);
                 sidebarBuilder.add(tabs, newTabs[i]);
-                //tabpanels.appendChild(newTabPanels[i]);
                 sidebarBuilder.add(tabpanels, newTabPanels[i]);
             }
             
-            //tabbox.appendChild(tabpanels);
+
             sidebarBuilder.add(tabbox, tabpanels);
-            //tabbox.appendChild(tabs);
             sidebarBuilder.add(tabbox, tabs);
             
         }
@@ -454,24 +442,12 @@ extension.prototype = {
             labelinpanel.setAttribute("value", "Sorry, this page has no forms.");
             
             noformTab.setAttribute("label", "No Forms");
-            
 
-
-            
-            //tabs.appendChild(noformTab);
             sidebarBuilder.add(tabs, noformTab);
-            
-            //tabpanels.appendChild(noformPanel);
             sidebarBuilder.add(tabpanels, noformPanel);
-            
-            //noformPanel.appendChild(noformPanelVbox);
             sidebarBuilder.add(noformPanel, noformPanelVbox);
-            
-            //noformPanelVbox.appendChild(labelinpanel);
             sidebarBuilder.add(noformPanelVbox, labelinpanel);
-                               //tabbox.appendChild(tabpanels);
             sidebarBuilder.add(tabbox, tabpanels);     
-                        //tabbox.appendChild(tabs);
             sidebarBuilder.add(tabbox, tabs);
 
         }
