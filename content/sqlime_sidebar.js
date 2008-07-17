@@ -43,7 +43,8 @@ const __sqli_me_prefs_to_disable = [
         {"name": "security.warn_viewing_mixed", "type":"bool", "ourValue": false},
         {"name": "dom.max_chrome_script_run_time", "type":"int", "ourValue": 0},
         {"name": "signon.autofillForms", "type":"bool", "ourValue":false}, /* to remove autofilling forms in Fx3 */
-        {"name": "signon.prefillForms", "type":"bool", "ourValue":false}, /* same as above but for Fx2 */        {"name": "signon.rememberSignons", "type":"bool", "ourValue":false},
+        {"name": "signon.prefillForms", "type":"bool", "ourValue":false}, /* same as above but for Fx2 */
+        {"name": "signon.rememberSignons", "type":"bool", "ourValue":false},
         {"name": "accessibility.typeaheadfind.enablesound", "type":"bool", "ourValue":false}
         ];
  
@@ -261,19 +262,29 @@ extension.prototype = {
         var assignFormElementValueToSideBar =  function(event){
             sidebarElement.value = formElement.value.toString();
         }
-                        
-        formElement.addEventListener('keypress', 
-                assignFormElementValueToSideBar, true);
-        formElement.addEventListener('mouseup', 
-                assignFormElementValueToSideBar, true);
-        formElement.addEventListener('change', 
-                assignFormElementValueToSideBar, true);
-        sidebarElement.addEventListener('input', 
-                assignSidebarValueToFormElement, true);
-        sidebarElement.addEventListener('click', 
-                assignSidebarValueToFormElement, true);
-                
-                           
+        
+        var releaseMemory = function(event){
+            formElement.removeEventListener('keypress', 
+                    assignFormElementValueToSideBar, true);
+            formElement.removeEventListener('mouseup', 
+                    assignFormElementValueToSideBar, true);
+            formElement.removeEventListener('change', 
+                    assignFormElementValueToSideBar, true);
+            sidebarElement.removeEventListener('input', 
+                    assignSidebarValueToFormElement, true);
+            sidebarElement.removeEventListener('click', 
+                    assignSidebarValueToFormElement, true);
+            getMainHTMLDoc().removeEventListener('unload', arugments.callee,
+                    true);
+        }
+        formElement.addEventListener('keypress', assignFormElementValueToSideBar, true);
+        formElement.addEventListener('mouseup', assignFormElementValueToSideBar, true);
+        formElement.addEventListener('change', assignFormElementValueToSideBar, true);
+        sidebarElement.addEventListener('input', assignSidebarValueToFormElement, true);
+        sidebarElement.addEventListener('click', assignSidebarValueToFormElement, true);
+        getMainHTMLDoc().addEventListener('unload', releaseMemory, true);
+        
+        
     }
     ,
     do_generate_form_ui: function() {
@@ -365,6 +376,7 @@ extension.prototype = {
                         }
                         sidebarElement = sidebarElement.getElementsByAttribute('editable', 'true')[0];
                         this.syncSidebarToForm(sidebarElement, aForm.elements[n]);
+                        
                     }
                     
                 }
@@ -448,8 +460,6 @@ extension.prototype = {
             getSidebarBuilder().add(noformPanelVbox, labelinpanel);
             
         }
-        
-        
         
         getSidebarBuilder().start();
         

@@ -20,7 +20,7 @@ If you have any questions regarding SQL Inject Me please contact
 tools@securitycompass.com
 */
 
-function SidebarBuilder(){
+function SidebarBuilder() {
     
     this.toBeAdded = new Array();
     var prefService = Components.classes['@mozilla.org/preferences-service;1'].
