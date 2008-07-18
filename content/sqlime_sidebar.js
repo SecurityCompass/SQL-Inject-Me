@@ -71,6 +71,14 @@ function getMainHTMLDoc(){
     return currentDocument;
 }
  
+ 
+function getMainHTMLWindow() {
+    var mainWindow = getMainWindow();
+    var elTabBrowser = mainWindow.document.getElementById('content');
+    var win  = elTabBrowser.contentWindow;
+    return win;
+}
+
 function extension(){
     //do nothing right now...
     this.plistener = null;
@@ -266,6 +274,9 @@ extension.prototype = {
             sidebarElement.value = formElement.value.toString();
         }
         
+        var w = window;
+        var htmlContentWindow = getMainHTMLWindow();
+        
         var releaseMemory = function(event){
             formElement.removeEventListener('keypress', 
                     assignFormElementValueToSideBar, true);
@@ -277,15 +288,18 @@ extension.prototype = {
                     assignSidebarValueToFormElement, true);
             sidebarElement.removeEventListener('click', 
                     assignSidebarValueToFormElement, true);
-            getMainHTMLDoc().removeEventListener('unload', arugments.callee,
+            w.removeEventListener('unload', arguments.callee, true);
+            htmlContentWindow.removeEventListener('unload', arguments.callee,
                     true);
         }
+        
         formElement.addEventListener('keypress', assignFormElementValueToSideBar, true);
         formElement.addEventListener('mouseup', assignFormElementValueToSideBar, true);
         formElement.addEventListener('change', assignFormElementValueToSideBar, true);
         sidebarElement.addEventListener('input', assignSidebarValueToFormElement, true);
         sidebarElement.addEventListener('click', assignSidebarValueToFormElement, true);
-        getMainHTMLDoc().addEventListener('unload', releaseMemory, true);
+        htmlContentWindow.addEventListener('unload', releaseMemory, true);
+        w.addEventListener('unload', releaseMemory, true);
         
         
     }
@@ -495,10 +509,10 @@ extension.prototype = {
         mainWindow.document.getElementById('content').
                 removeProgressListener(this.plistener);
                 
-        if (this.windowEventListenerClosure) {
+        if (this.windowEventClosure) {
             mainWindow.getBrowser().tabContainer.
                     removeEventListener('TabSelect',
-                            this.windowEventListenerClosure,
+                            this.windowEventClosure,
                             false);
             this.windowEventListenerClosure = null;
         }
