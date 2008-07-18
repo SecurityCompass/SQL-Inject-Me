@@ -345,8 +345,7 @@ extension.prototype = {
                 var aForm = maindoc.forms[i];
                 var formname = null;
                 var formPanel = document.createElement("tabpanel");
-                var fieldsWithUI = new Object();
-                
+                var fieldsWithUI = new Object();    
                 var formTab = document.createElement("tab");
                 
                 dump(q++ + "\n");
@@ -412,7 +411,7 @@ extension.prototype = {
               on addition to the DOM, ex. selected). */
             
             //Add the form UI to the DOM.
-            for (var i =0; i < newTabs.length; i++) {
+            for (var i = newTabs.length-1; i >= 0; i--) {
 
                 for each(var fieldUI in newTabForms[i]) {
                     sidebarBuilder.add(newTabPanelVbox[i], fieldUI, selectFirstMenuItemForField);
