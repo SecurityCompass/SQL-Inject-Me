@@ -155,11 +155,13 @@ extension.prototype = {
     getFieldsToTest: function(testType) {
         var rv = null;
         var tabbox = document.getElementById('sidebarformtabbox');
+        var mainDoc = getMainWindow().document.getElementById('content').contentDocument;
+                
         if (testType.singleFormTest) {
             rv = this.getMarkedFieldsForPanel(tabbox.selectedPanel, false, tabbox.selectedIndex);
             for each (field in rv) {
                 field.formIndex = tabbox.selectedIndex;
-                field.formName = getMainHTMLDoc().forms[tabbox.selectedIndex].name;
+                field.formName = getHTMLFormElementNameOrLabel(mainDoc.forms[tabbox.selectedIndex]);
             }
         }
         else {
@@ -172,7 +174,7 @@ extension.prototype = {
                         childNodes.item(n), true, n);
                 for each (field in temp) {
                     field.formIndex = n;
-                    field.formName = getMainHTMLDoc().forms[n].name;
+                    field.formName = getHTMLFormElementNameOrLabel(mainDoc.forms[n]);
                     
                 }
                 if (rv) {

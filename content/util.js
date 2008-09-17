@@ -209,3 +209,7 @@ function compareContentDocuments(origTabContentDocument, workTabContentDocument)
     }
     return rv
 }
+
+function getHTMLFormElementNameOrLabel(element) {
+    return element.name?element.name:element.id;
+}
