@@ -33,10 +33,6 @@ tools@securitycompass.com
 function AttackRunner(){
 
     this.className = "AttackRunner";
-    /**
-     * a reference to the nsIHttpChannel being used by this
-     */
-    this.channel = null;
     
     /**
      * uniqueID is important for heuristic tests which need a random string in
@@ -73,7 +69,7 @@ AttackRunner.prototype = {
         var mainBrowser = getMainWindow().getBrowser();
         var currentTab = mainBrowser.selectedTab;
         var wroteTabData = false;
-        var tabManager = new TabManager();
+        var tabManager = new TabManager(currentTab.linkedBrowser);
         var self = this; //make sure we always have a reference to this object
         var formData = null;
         
@@ -84,7 +80,7 @@ AttackRunner.prototype = {
         this.field = field;
         this.tabIndex = tabIndex;
         
-        tabManager.readTabData(currentTab);
+        //tabManager.readTabData(currentTab);
         
         if (field)
         {
@@ -113,7 +109,8 @@ AttackRunner.prototype = {
         // the IO service
         var ioService = Components.classes['@mozilla.org/network/io-service;1']
                 .getService(Components.interfaces.nsIIOService);
-        var formURL = browser.contentDocument.URL;
+
+        var formURL = formData.
         var form = browser.contentDocument.forms[formIndex];
         var formAction = form.action ? form.action : browser.contentDocument.
                 location.toString();
@@ -138,16 +135,15 @@ AttackRunner.prototype = {
                     classes['@mozilla.org/io/string-input-stream;1'].
                     createInstance(Components.interfaces.nsIStringInputStream);
             inputStream.setData(formData, formData.length);
-           this.channel.QueryInterface(Components.interfaces.nsIUploadChannel).
+            this.channel.QueryInterface(Components.interfaces.nsIUploadChannel).
                     setUploadStream(inputStream, 
                     'application/x-www-form-urlencoded', -1);
-           this.channel.QueryInterface(Components.interfaces.nsIHttpChannel).
+            this.channel.QueryInterface(Components.interfaces.nsIHttpChannel).
                     requestMethod = 'POST';
         }
         
-        var streamListener = new StreamListener(this, resultsManager);
         streamListener.testData = this.testData;
-       this.channel.asyncOpen(streamListener, null);
+        this.channel.asyncOpen(streamListener, null);
     }
 }
 

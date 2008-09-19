@@ -25,82 +25,76 @@ tools@securitycompass.com
  * Much of this system relies on working with the tab browser. This file 
  * encapsulates all that functionality.
  */
- 
-function TabManager(){
-    this.tabForms = null;
-    this.tabHistory = null;
-    this.index = 10;
+
+/**
+ * Captures information about the target page from the browser in the foreground tab,
+ * since the user may change the state of that browser while the tests are in progress.
+ * @param  browser a browser pointed at the page that the test battery will be run against
+ * @return         a (new) TabManager object for use with the current test battery
+ */
+function TabManager(browser){
+
+    // Cache the URL, referrer and postdata of the browser, for access via loadTargetPage().
+    // Cache its contentDocument as a basis for comparison, to ensure other browsers have loaded correctly.
+    this.targetContentDocument = browser.contentDocument;
+    this.targetPagePostData = null;
+    var sh = browser.sessionHistory;
+    if (sh.count) {
+        var currentEntry = sh.getEntryAtIndex((sh.index), false);
+        if (currentEntry.postData) {
+            var postDataStream = Components.classes["@mozilla.org/scriptableinputstream;1"]
+                                 .createInstance(Components.interfaces.nsIScriptableInputStream);
+            postDataStream.init(currentEntry.postData);
+            // Supposedly it's bad to retrieve all postData at once,
+            // in case there's a lot of it, because other pseudothreads can't interrupt?
+            var buffer = null;
+            while (foo = postDataStream.read(512)) {
+                this.targetPostData += buffer;
+            }
+        }
+        this.targetPage = currentEntry.URI.spec;
+        this.targetPageReferrer = currentEntry.referrerURI || null;
+    }
+    else {
+        this.targetPage = browser.webNavigation.currentURI.spec;
+        this.targetPageReferrer = null;
+    }
+
+    // Extract a list of the forms on the page.
+    this.tabForms = new Array();
+    var forms = browser.docShell.document.forms;
+    for (var i = 0; i < forms.length; i++) {
+        this.tabForms[i] = new Array();
+        for (var j = 0; j < forms[i].elements.length; j++) {
+            var elem = forms[i].elements[j];
+            switch (elem.nodeName.toLowerCase()) {
+                case 'submit':
+                case 'reset':
+                case 'image':
+                case 'button':
+                case 'fieldset':
+                    this.tabForms[i].push(null);
+                    break;
+                case 'checkbox':
+                case 'radio':
+                    this.tabForms[i].push(elem.checked);
+                    break;
+                default:
+                    this.tabForms[i].push(elem.value);
+            }
+        }
+    }
+    
+    this.index = browser.webNavigation.sessionHistory.index;
 }
 
 TabManager.prototype = {
-    readTabData: function(tab){
-        this.tabForms = new Array();
-        
-        this.readTabHistory(tab.linkedBrowser.webNavigation.sessionHistory);
-        this.readTabForms(tab.linkedBrowser.docShell.document.forms);
-        this.index = tab.linkedBrowser.webNavigation.sessionHistory.index;
-        dump('got an history index of : ' + this.index + '\n');
-    }
-    ,
-    readTabHistory: function(sessionHistory){
-        this.tabHistory = new Array();
-        for (var i = 0; i < sessionHistory.count; i++){
-            dump('copying history: ' + sessionHistory.getEntryAtIndex(i, false).URI + '  ' + sessionHistory.getEntryAtIndex(i, false).title + '\n');
-            this.tabHistory.push(sessionHistory.getEntryAtIndex(i, false));
-        }
-    }
-    ,
-    readTabForms: function(forms){
-        this.tabForms = Array();
-           
-        for (var i = 0; i < forms.length; i++)
-        {
-            this.tabForms[i] = new Array();
-            for (var j = 0; j < forms[i].elements.length; j++)
-            {
-                var elem = forms[i].elements[j];
-                if (elem.nodeName.toLowerCase() == 'submit' || elem.nodeName.toLowerCase() == 'reset' || elem.nodeName.toLowerCase() == 'image' || elem.nodeName.toLowerCase() == 'button')
-                {
-                    //this just keeps all the arrays parallell
-                    this.tabForms[i].push(null);
-                }
-                else if (elem.nodeName.toLowerCase() == 'checkbox' || elem.nodeName.toLowerCase() == 'radio')
-                {
-                    this.tabForms[i].push(elem.checked);
-                }
-                else
-                {
-                    this.tabForms[i].push(elem.value);
-                }
-            }
-        }
-    }
-    ,
-    hasTabData: function (){
-        return ( (this.tabForms !== null && this.tabHistory !== null) &&
-                 (this.tabForms.length !== 0 || this.tabHistory.length !== 0) )
-    }
-    ,
-    writeTabHistory: function(webNavigation){
-        dump('starting tabbrowsermanager::writeTabHistory\n');
-        var sessionHistory = webNavigation.sessionHistory;
-        if (this.tabHistory && this.tabHistory.length > 0){
-            sessionHistory.QueryInterface(Components.interfaces.nsISHistoryInternal);
-            if (sessionHistory.count > 0){
-                sessionHistory.PurgeHistory(sessionHistory.count);
-            }
-            for each(var historyItem in this.tabHistory){
-                dump('copying history: ' + historyItem.URI + '  ' + historyItem.title + '\n;');
-                sessionHistory.addEntry(historyItem, true);
-            }
-            try {
-                webNavigation.gotoIndex(this.index);
-            }
-            catch(err){
-                dump('failed a go to index ' + err + '\n');   
-            }
-        }
-        dump('stopping tabbrowsermanager::writeTabHistory\n');
+    /**
+     * Point a browser at the target page recorded by this TabManager.
+     * @param browser the browser to point to the target page
+     */
+    loadTargetPage: function (browser) {
+        browser.webNavigation.loadURI(this.targetPage, 0, this.targetPageReferrer, this.targetPagePostData, null);
     }
     ,
     writeTabForms: function(forms, testFormIndex, testFieldIndex, testData){
@@ -178,15 +172,6 @@ TabManager.prototype = {
             rv.push(fieldInfo);
         }
         return rv;
-    }
-    ,
-    writeTabData: function(tab){
-        this.writeTabHistory(tab.linkedBrowser.webNavigation);
-        dump('writting tab data... tab.linkedBrowser.webNavigation  == ' + tab.linkedBrowser.webNavigation + '\n');
-        dump('tab.linkedBrowser.docShell.document.forms == ' + tab.linkedBrowser.contentDocument.forms + '\n');
-        
-        this.writeTabForms(tab.linkedBrowser.contentDocument.forms );
-       
     }
     ,
     /**
