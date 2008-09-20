@@ -84,7 +84,7 @@ function checkForErrorString(browser) {
 }
 
 function checkForServerResponseCode(streamListener){
-    var nsiHttpChannel = streamListener.attackRunner.channel;
+    var nsiHttpChannel = streamListener.attackRunner.channel.QueryInterface(Components.interfaces.nsIHttpChannel);
     var stringEncoder = getHTMLStringEncoder();
     try{
         if ((nsiHttpChannel.responseStatus === undefined || nsiHttpChannel.responseStatus === null)){
@@ -106,6 +106,6 @@ function checkForServerResponseCode(streamListener){
     }
     catch(err){
         Components.utils.reportError(err);
-        return false;
+        return [];
     }
 }

@@ -200,15 +200,17 @@ extension.prototype = {
         
         var testType = this.getTestType(event);
         var fieldsToTest = this.getFieldsToTest(testType);
+        var testCount = 0;
+        var tabManager = new TabManager(getMainWindow().getBrowser().selectedTab.linkedBrowser)
         
         if (fieldsToTest.length === 0) {
             alert('Please make sure you have selected fields to test.')
             this.postTest();
+            testCount = fieldsToTest.length * heuristicTestChars.length;
             return;
         }
         else {
             testCount = fieldsToTest.length * testType.count * 2;
-            //*2 is for the number of evaluators.
         }
         
         this.warningDialog = window.openDialog(
@@ -217,8 +219,7 @@ extension.prototype = {
         
         var testManager = getTestManager(this);
         
-        testManager.runTest(testType, fieldsToTest);
-        
+        testManager.runTest(testType, fieldsToTest, tabManager);        
     }
     ,
     createActionUI: function() {
@@ -661,6 +662,7 @@ extension.prototype = {
      * been completed so that the popup's UI can be updated
      */
     finishedTest: function() {
+        Components.utils.reportError("foo");
         if (this.warningDialog.closed === false && typeof(this.warningDialog.finishedTest) == 'function') {
             this.warningDialog.finishedTest();
         }

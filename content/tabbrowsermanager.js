@@ -65,6 +65,12 @@ function TabManager(browser){
     var forms = browser.docShell.document.forms;
     for (var i = 0; i < forms.length; i++) {
         this.tabForms[i] = new Array();
+        this.tabForms[i].elements ={};
+        this.tabForms[i].elements.length = forms[i].elements.length;
+        this.tabForms[i].action = forms[i].action ? forms[i].action : browser.contentDocument.
+                location.toString();
+        this.tabForms[i].method = forms[i].method;
+        
         for (var j = 0; j < forms[i].elements.length; j++) {
             var elem = forms[i].elements[j];
             switch (elem.nodeName.toLowerCase()) {
@@ -74,14 +80,23 @@ function TabManager(browser){
                 case 'button':
                 case 'fieldset':
                     this.tabForms[i].push(null);
+                    this.tabForms[i].elements[elem.name] = this.tabForms[i].
+                            elements[j] = null;
                     break;
                 case 'checkbox':
                 case 'radio':
                     this.tabForms[i].push(elem.checked);
+                     this.tabForms[i].elements[elem.name] = this.tabForms[i].
+                            elements[j] = elem.checked;
                     break;
                 default:
                     this.tabForms[i].push(elem.value);
+                    this.tabForms[i].elements[elem.name] = this.tabForms[i].
+                            elements[j] = elem.value
             }
+        }
+        if (! this.tabForms[forms[i].name]){
+            this.tabForms[forms[i].name] = this.tabForms[i];
         }
     }
     
@@ -155,11 +170,10 @@ TabManager.prototype = {
         }
     }
     ,
-    getTabData: function(forms, testFormIndex, testFieldIndex, testString){
-        dump('writeTabForms::forms ' + forms[0] + '\n');
+    getTabData: function(testFormIndex, testFieldIndex, testString){
         var rv = new Array();
         var formIndex = testFormIndex;
-    
+        var forms = this.tabForms;
         for (var elementIndex = 0; 
             elementIndex < forms[formIndex].elements.length; 
             elementIndex++)
@@ -177,11 +191,12 @@ TabManager.prototype = {
     /**
      * This returns the data in a form 
      */
-    getFormDataForURL: function(forms, testFormIndex, testFieldIndex, 
+    getFormDataForURL: function(testFormIndex, testFieldIndex, 
             testData)
     {
         var formIndex = testFormIndex;
         var rv = '';
+        var forms = this.tabForms;
         for (var elementIndex = 0; 
             elementIndex < forms[testFormIndex].elements.length; 
             elementIndex++)

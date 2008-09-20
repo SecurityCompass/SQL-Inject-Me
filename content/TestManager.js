@@ -47,14 +47,19 @@ function TestManager(){
 TestManager.prototype = {
     /**
      * Runs a test on the passed fields.
-     * @param testType the test type
-     * @param fieldsToTest the fields to test
+     * @param testType           whether to test with all the strings or just with the top strings
+     * @param fieldsToTest       the fields to test with this battery
+     * @param tabManager         information about the target page
      */
-    runTest: function (testType, fieldsToTest) {
+    runTest: function (testType, fieldsToTest, tabManager) {
         
         this.testType = testType;
         
         this.clear();
+        
+        this.fieldsToTest = fieldsToTest;
+
+        this.tabManager = tabManager;
         
         this.runThoroughTest(testType, fieldsToTest);
     }
@@ -114,51 +119,6 @@ TestManager.prototype = {
     }
     ,
     /**
-     * Runs the heuristic tests.
-     * @param testType the type of test.
-     * @param fieldsToTest the fields to test.
-     */
-    runHeuristicTest: function(testType, fieldsToTest) {
-        
-        var testChars = this.controller.getHeuristicTestChars();
-        var self = this;
-        var testRunnerContainer = getTestRunnerContainer();
-        
-        testRunnerContainer.clear();
-        
-        for each (var c in testChars) {
-            
-            for each (var field in fieldsToTest) {
-                
-                var testRunner = new AttackRunner();
-                
-                var testData = new Object();
-                testData.string = testRunner.uniqueID.toString() + c.toString();
-                
-                this.resultsStillExpected++;
-                
-                testRunnerContainer.addTestRunner(testRunner,
-                        null,
-                        field.formIndex,
-                        field,
-                        testData,
-                        self);
-                
-            }
-        }
-        
-        getTestRunnerContainer(getMainWindow().document.
-                getElementById('content').mTabs.length, self);
-        
-        if (testRunnerContainer.keepChecking === false) {
-            testRunnerContainer.keepChecking = true;
-        }
-        
-        testRunnerContainer.start();
-        
-    }
-    ,
-    /**
      * runs non-heuristic tests on the fields.
      * @param testType with all strings or just the top strings.
      */
@@ -166,7 +126,6 @@ TestManager.prototype = {
         
         this.resultsManager = new ResultsManager(this.controller);
         
-        this.resultsManager.addEvaluator(checkForErrorString);
         this.resultsManager.addSourceEvaluator(checkSrcForErrorString);
         this.resultsManager.addSourceEvaluator(checkForServerResponseCode);
         
@@ -195,13 +154,13 @@ TestManager.prototype = {
         }
         
         var self = this;
-        var testRunnerContainer = getTestRunnerContainer(getMainWindow().
-                document.getElementById('content').mTabs.length, self);
+        
+        var testRunnerContainer = getTestRunnerContainer(self);
         
         if (testRunnerContainer.keepChecking === false) {
             testRunnerContainer.keepChecking = true;
         }
-        testRunnerContainer.start(); 
+        testRunnerContainer.start(this.tabManager); 
         
     }
     ,
@@ -214,32 +173,7 @@ TestManager.prototype = {
         function checkAgain() {
             self.doneTesting();
         }
-        if (this.waitingForHeuristicTests === true) {
-        
-            if (this.resultsStillExpected === 0) {
-                this.waitingForHeuristicTests = false;
-                if (this.vulnerableFields.length > 0) {
-                    this.waitingForHeuristicTests = false;
-                    function doRunThoroughTests(){
-                        getTestRunnerContainer().clearWorkTabs();
-                        self.controller.warningDialog.startThoroughTesting(self.vulnerableFields.length, self.testType);
-                        self.runThoroughTest(self.testType, self.vulnerableFields);
-                    }
-                    window.setTimeout(doRunThoroughTests, 0);
-                }
-                else {
-                    this.resultsManager = new ResultsManager(self.controller)
-                    this.resultsManager.showResults(this);
-                    getTestRunnerContainer().clearWorkTabs();
-                    this.controller.postTest();
-                }
-            }
-            else {
-                window.setTimeout(checkAgain, 1);
-            }
-            
-        }
-        else if (this.controller) {
+        if (this.controller) {
             if (this.resultsManager.allResultsLogged === false){
                 dump('\nnot done yet...');
                 window.setTimeout(checkAgain, 100);

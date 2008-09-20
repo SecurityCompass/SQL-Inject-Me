@@ -6,7 +6,7 @@ This file is part of SQL Inject Me.
 SQL Inject Me is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+(at your option) any later version
 
 SQL Inject Me is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -40,6 +40,10 @@ function AttackRunner(){
      */
     this.uniqueID = Math.floor(Date.now() * Math.random());
     
+    this.tabWrapper = null;
+    
+    this.resultsWrappers = new Array();
+    
 }
 
 AttackRunner.prototype = {
@@ -63,46 +67,47 @@ AttackRunner.prototype = {
         return formFound;
     }
     ,
+    /**
+     * Begin an individual test.
+     * @param formPanel      currently unused
+     * @param formIndex      index, in the list of forms, of the one being tested
+     * @param field          the field to inject
+     * @param testValue      the input containing the injection
+     * @param resultsManager evaluates the results of the test
+     * @param tabWrapper     contains the tab to run the test in
+     * @param tabManager     provides information about the target page
+     */
     do_test: function(formPanel, formIndex, field, testData, resultsManager,
-            tabIndex)
+            tabWrapper, tabManager)
     {
-        var mainBrowser = getMainWindow().getBrowser();
-        var currentTab = mainBrowser.selectedTab;
         var wroteTabData = false;
-        var tabManager = new TabManager(currentTab.linkedBrowser);
-        var self = this; //make sure we always have a reference to this object
+        var self = this;
         var formData = null;
-        
-        //var browser = mainBrowser.getBrowserAtIndex(tabIndex);
              
         this.formIndex = formIndex;
         this.fieldIndex = field.index;
         this.field = field;
-        this.tabIndex = tabIndex;
-        
-        //tabManager.readTabData(currentTab);
+        this.tabWrapper = tabWrapper
+
         
         if (field)
         {
-            formData = tabManager.getFormDataForURL(mainBrowser.
-                    contentDocument.forms,  formIndex, field.index, 
+            formData = tabManager.getFormDataForURL(formIndex, field.index, 
                     testData.string);
         }
         else 
         {
-            formData = tabManager.getFormDataForURL(mainBrowser.
-                    contentDocument.forms,  formIndex, null, testData.string);
+            formData = tabManager.getFormDataForURL(formIndex, null, testData.string);
         }
-        this.testData = tabManager.getTabData(mainBrowser.
-                    contentDocument.forms,  formIndex, field.index, testData.string);
+        this.testData = tabManager.getTabData(formIndex, field.index, testData.string);
         dump('\ndoing source test...');
         this.do_source_test(formIndex, formIndex, field, testData,
-                resultsManager, mainBrowser,formData);
+                resultsManager, formData, tabManager);
         
     }
     ,
-    do_source_test:function(formPanel, formIndex, field, testData, resultsManager, 
-            browser, formData) {
+    do_source_test:function(formPanel, formIndex, field, testData,
+                            resultsManager,  formData, tabManager) {
         var streamListener = new StreamListener(this, resultsManager);
         resultsManager.addSourceListener(streamListener);
 
@@ -110,11 +115,11 @@ AttackRunner.prototype = {
         var ioService = Components.classes['@mozilla.org/network/io-service;1']
                 .getService(Components.interfaces.nsIIOService);
 
-        var formURL = formData.
-        var form = browser.contentDocument.forms[formIndex];
-        var formAction = form.action ? form.action : browser.contentDocument.
-                location.toString();
-                
+        
+        var form = tabManager.tabForms[formIndex];
+        var formAction = form.action;
+        var formURL = (form.action.indexOf("?") == -1) ? formAction : formAction.split("?")[0];
+                        
         dump('AttackRunner::do_source_test  formAction=== '+formAction+'\n');
         if (form.method.toLowerCase() != 'post'){
             formAction += formAction.indexOf('?') === -1 ? '?' : '&';
@@ -124,11 +129,12 @@ AttackRunner.prototype = {
         dump('attackrunner::do_source_test::formAction == ' + formAction + '\n');
         dump('attackrunner::do_source_test::formData == ' + formData + '\n');
         
-        var uri = ioService.newURI(formAction, null, null);
-        var referingURI = ioService.newURI(formURL, null, null);
+        var uri = ioService.newURI(formURL, null, null);
+        Components.utils.reportError("got a " + uri.toString() + " from a " + formURL)
+        //var referingURI = ioService.newURI(formAction, null, null);
         this.channel = ioService.newChannelFromURI(uri);
-        this.channel.QueryInterface(Components.interfaces.nsIHttpChannel).
-                referrer = referingURI;
+        //this.channel.QueryInterface(Components.interfaces.nsIHttpChannel).
+        //       referrer = referingURI;
         
         if (form.method.toLowerCase() == 'post'){
             var inputStream = Components.
@@ -145,12 +151,4 @@ AttackRunner.prototype = {
         streamListener.testData = this.testData;
         this.channel.asyncOpen(streamListener, null);
     }
-}
-
-function callEvaluate(browser, attackRunner, resultsManager) {
-    var results = resultsManager.evaluate(browser, attackRunner);
-    for each (result in results){
-        tabManager.addFieldData(result);
-    }
-    getTestRunnerContainer().freeTab(attackRunner.tabIndex);
 }

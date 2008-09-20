@@ -73,7 +73,6 @@ ResultsManager.prototype = {
             dump('\nall results logged now.')
             this.allResultsLogged = true;
         }
-        
     }
     ,
     evaluate: function(browser, attackRunner){
@@ -270,7 +269,6 @@ ResultsManager.prototype = {
             }
         }
         return [numTestsRun, numFailes, numWarnings, numPasses];
-
     }
     ,
     /**
@@ -528,6 +526,8 @@ ResultsManager.prototype = {
             
             observerService.removeObserver(attackHttpResponseObserver, 
                     AttackHttpResponseObserver_topic);
+            
+            attackRunner.resultsWrappers.push(resultsWrapper);
                     
             this.addResults(resultsWrapper);
             
@@ -546,14 +546,14 @@ ResultsManager.prototype = {
     }
     ,
     addSourceEvaluator: function(sourceEvaluator){
-        this.sourceEvaluators.push(sourceEvaluator);
+        var foo = this.sourceEvaluators.push(sourceEvaluator);
+        Components.utils.reportError(" the new length is : " + foo);
     }
     ,
     evaluateSource: function(streamListener){
         
         var attackRunner = streamListener.attackRunner;
-        
-        for each(sourceEvaluator in this.sourceEvaluators){
+        for each(var sourceEvaluator in this.sourceEvaluators){
             var results = sourceEvaluator(streamListener);
             for each (var result in results){
                 result.testData = attackRunner.testData;
@@ -568,13 +568,17 @@ ResultsManager.prototype = {
         }
         var index = this.sourceListeners.indexOf(streamListener);
         this.sourceListeners.splice(index, 1);
+        
+        /* @todo this should probably be elsewhere */
+        attackRunner.tabWrapper.inUse = false;
+        attackRunner.tabWrapper = null;
+        
         if (this.sourceListeners.length === 0 &&
             getTestRunnerContainer().testRunners.length === 0)
         {
             dump('\nall results now logged');
             this.allResultsLogged = true;
         }
-        getTestRunnerContainer().freeTab(attackRunner.tabIndex);
 
         
     }

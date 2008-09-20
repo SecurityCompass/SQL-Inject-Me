@@ -27,71 +27,63 @@ tools@securitycompass.com
 /**
  * Based around a poor man's semaphore concept.
  */
-function TestRunnerContainer(currentNumTabs){
+function TestRunnerContainer(){
     this.testRunners = new Array(); //All these arrays are parallell
     this.formPanels = new Array();
     this.formIndexes = new Array();
     this.fields = new Array();
-    this.testDatas = new Array();
+    this.testValues = new Array();
     this.resultsManagers = new Array();
-    this.baseNumTabs = currentNumTabs;
     this.testManager = null;
     this.keepChecking = true;
-    this.tabs = null;
-    
 }
 
 TestRunnerContainer.prototype = {
     addTestRunner: function(testRunner, formPanel, formIndex, field, 
-            testData, resultsManager)
+            testValue, resultsManager)
     {
         this.testRunners.push(testRunner);
         this.formPanels.push(formPanel);
         this.formIndexes.push(formIndex);
         this.fields.push(field);
-        this.testDatas.push(testData);
+        this.testValues.push(testValue);
         this.resultsManagers.push(resultsManager);
     }
     ,
-    start: function(){
-        var self = this;
-        var mainWindow = getMainWindow();
-        var tabBrowser = mainWindow.document.getElementById('content');
-        var numTabsToUse = this.getNumWorkTabs();
-        var firstEmptyIndex = 0;
-        var hasEmptyIndex = false;
-        for (var index in this.tabs) {
-                if (this.tabs[index] === null) {
-                    hasEmptyIndex= true;
-                    firstEmptyIndex = parseInt(index);
-                    this.tabs[index] = true;
-                    break;
-                }
-        }
-        if (hasEmptyIndex === true && this.testRunners.length !== 0) {
-            var testRunner = this.testRunners.pop();
-            var formPanel = this.formPanels.pop();
-            var formIndex = this.formIndexes.pop();
-            var field = this.fields.pop();
-            var testData = this.testDatas.pop();
-            var resultsManager = this.resultsManagers.pop();
-            
-            testRunner.do_test(formPanel, formIndex, field, testData, 
-                    resultsManager, firstEmptyIndex+this.baseNumTabs);
-            
-        }
-        else if (this.testRunners.length === 0) {
+    /* Called to begin a new test battery in this container.
+     * @param tabManager information about the target of this battery
+     */
+    start: function (tabManager) {
+        // Has another part of the program halted the testing?
+        if (!this.keepChecking) return;
+        dump("check for more attacks: " + this.testRunners.length);
+        // Do we have any more tests to run?
+        if (this.testRunners.length == 0) {
+            Components.utils.reportError("so done checking? kthxbye");
             this.keepChecking = false;
             this.testManager.doneTesting();
-            
+            return;
+        }
+
+        // Begin the next test in the first available tab and move that tab to the back of the queue.
+        for (var i = 0; i < this.tabWrappers.length; i++) {
+            if (!this.tabWrappers[i].inUse) {
+                this.tabWrappers[i].inUse = true;
+                this.testRunners.pop().do_test(this.formPanels.pop(),
+                                               this.formIndexes.pop(),
+                                               this.fields.pop(),
+                                               this.testValues.pop(), 
+                                               this.resultsManagers.pop(),
+                                               this.tabWrappers[i],
+                                               tabManager);
+                this.tabWrappers.push(this.tabWrappers.splice(i, 1)[0]);
+                Components.utils.reportError("Running a test");
+                break;
+            }
         }
         
-        function doAgain(){
-            self.start();
-        }
-        if (this.keepChecking === true) {
-            setTimeout(doAgain, 1);
-        }
+        var self = this;
+        setTimeout(function() { self.start(tabManager); }, 1);
     }
     ,
     numWorkTabs: 6
@@ -113,22 +105,23 @@ TestRunnerContainer.prototype = {
         this.formPanels.splice(0, this.formPanels.length);
         this.formIndexes.splice(0, this.formPanels.length);
         this.fields.splice(0, this.formPanels.length);
-        this.testDatas.splice(0, this.formPanels.length);
+        this.testValues.splice(0, this.formPanels.length);
         this.resultsManagers.splice(0, this.formPanels.length);
     }
     ,
-    setup: function(currentNumTabs, testManager) {
-        this.baseNumTabs = currentNumTabs
+    /**
+     * Creates the tabs whose browsers will be used to run individual tests.
+     * @param testManager will be reported to when test battery is complete.
+     */
+    setup: function(testManager) {
         this.testManager = testManager;
-        this.tabs = null;
-        this.tabs = new Array();
-        for (var i = 0; i < this.getNumWorkTabs(); i++){
-            this.tabs[i] = null;
+        this.tabWrappers = new Array();
+        for (var i = 0; i < this.getNumWorkTabs(); i++) {
+            this.tabWrappers[i] = {
+              inUse: false,
+              tab: null 
+            };
         }
-    }
-    ,
-    freeTab: function(tabIndex) {
-        this.tabs[tabIndex-this.baseNumTabs] = null;
     }
     ,
     clearWorkTabs: function () {
@@ -147,16 +140,16 @@ TestRunnerContainer.prototype = {
 /**
  * If currentNumTabs is provided, the container is cleared.
  */
-function getTestRunnerContainer(currentNumTabs, testManager){
+function getTestRunnerContainer(testManager){
     
     if (typeof(xssme__testrunnercontainer__) == 'undefined' || 
             !xssme__testrunnercontainer__ )
     {
-        xssme__testrunnercontainer__ = new TestRunnerContainer(currentNumTabs);
+        xssme__testrunnercontainer__ = new TestRunnerContainer();
     }
     
-    if (currentNumTabs && testManager) {
-        xssme__testrunnercontainer__.setup(currentNumTabs, testManager);
+    if (testManager) {
+        xssme__testrunnercontainer__.setup(testManager);
  
     }
     
