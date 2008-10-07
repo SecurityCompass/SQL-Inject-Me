@@ -73,26 +73,33 @@ function TabManager(browser){
         
         for (var j = 0; j < forms[i].elements.length; j++) {
             var elem = forms[i].elements[j];
+            var elemToUse = {};
+            elemToUse.nodeName = elem.nodeName;
+            elemToUse.name = elem.name;
             switch (elem.nodeName.toLowerCase()) {
                 case 'submit':
                 case 'reset':
                 case 'image':
                 case 'button':
                 case 'fieldset':
-                    this.tabForms[i].push(null);
+                    this.tabForms[i].push({});
                     this.tabForms[i].elements[elem.name] = this.tabForms[i].
-                            elements[j] = null;
+                            elements[j] = {};
                     break;
                 case 'checkbox':
                 case 'radio':
-                    this.tabForms[i].push(elem.checked);
-                     this.tabForms[i].elements[elem.name] = this.tabForms[i].
-                            elements[j] = elem.checked;
+                    elemToUse.checked = elem.checked;
+                    elemToUse.name = elem.name
+                    this.tabForms[i].push(elemToUse);
+                    this.tabForms[i].elements[elemToUse.name] = this.tabForms[i].
+                            elements[j] = elemToUse;
                     break;
                 default:
-                    this.tabForms[i].push(elem.value);
-                    this.tabForms[i].elements[elem.name] = this.tabForms[i].
-                            elements[j] = elem.value
+                    elemToUse.value = elem.value;
+                    elemToUse.name = elem.name
+                    this.tabForms[i].push(elemToUse);
+                    this.tabForms[i].elements[elemToUse.name] = this.tabForms[i].
+                            elements[j] = elemToUse;
             }
         }
         if (! this.tabForms[forms[i].name]){
@@ -202,17 +209,18 @@ TabManager.prototype = {
             elementIndex++)
         {
             var element = forms[testFormIndex].elements[elementIndex];
+            if (rv.length != 0){
+                rv+='&';
+            }
+            
             if (elementIndex == testFieldIndex) {
-                if (rv.length != 0){
-                    rv+='&';
-                }                
                 rv += element.name +'='+testData;
             }
-            if (element.value) {
-                if (rv.length != 0){
-                    rv+='&';
-                }                
+            else if (element.value) {
                 rv += element.name +'='+element.value;
+            }
+            else if (element.checked !== undefined ) {
+                rv += element + '=' + element.checked?1:0;
             }
         }
         return rv;

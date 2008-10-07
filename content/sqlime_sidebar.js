@@ -201,7 +201,7 @@ extension.prototype = {
         var testType = this.getTestType(event);
         var fieldsToTest = this.getFieldsToTest(testType);
         var testCount = 0;
-        var tabManager = new TabManager(getMainWindow().getBrowser().selectedTab.linkedBrowser)
+        var tabManager = new TabManager(getMainWindow().getBrowser().selectedTab.linkedBrowser);
         
         if (fieldsToTest.length === 0) {
             alert('Please make sure you have selected fields to test.')
