@@ -29,6 +29,7 @@ tools@securitycompass.com
         <preferences>
             <preference id="preferedNumAttacks"
                         name="extensions.sqlime.prefnumattacks"
+                        instantApply='true'
                         type="int"/>
             <preference id="showContextMenu"
                         name="extensions.sqlime.showcontextmenu"
@@ -36,13 +37,16 @@ tools@securitycompass.com
                         instantApply='true'/>
             <preference id="numtabstouse"
                         name="extensions.sqlime.numtabstouse"
+                        instantApply='true'
                         type="int"/>
             <preference id="prefSidebarBuildingPause"
-			name="extensions.sqlime.sidebarbuildingstop"
-			type="int" />
-	    <preference id="prefReportBuildingShowPass"
-			name="extensions.sqlime.reportbuilding.showPass"
-			type="bool" />
+			            name="extensions.sqlime.sidebarbuildingstop"
+                        instantApply='true'
+            			type="int" />
+	        <preference id="prefReportBuildingShowPass"
+			            name="extensions.sqlime.reportbuilding.showPass"
+                        instantApply='true'
+            			type="bool" />
         </preferences>
         <checkbox label="Show 'Open Sidebar' in context menu" preference="showContextMenu" />
 	<checkbox label="Show passed results in final report (Warning: long reports will cause heavy cpu load)" preference="prefReportBuildingShowPass" />
