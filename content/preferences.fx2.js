@@ -32,8 +32,7 @@ function PreferencesController() {
 
 PreferencesController.prototype = {
     init: function(){
-//         getErrorStringContainer();
-        
+               
         var attacks = getAttackStringContainer().getStrings();
         var errorStrings = getErrorStringContainer().getStrings();
         
@@ -70,7 +69,7 @@ PreferencesController.prototype = {
         }
         
         for(var i = 0; i < attacks.length; i++){
-                listbox.insertItemAt(i, attacks[i].string, i);
+                listbox.appendItem(attacks[i].string, i);
         }
     }
     ,
@@ -141,7 +140,6 @@ PreferencesController.prototype = {
         var nsIFilePicker = Components.interfaces.nsIFilePicker;
         var picker = Components.classes['@mozilla.org/filepicker;1'].createInstance(nsIFilePicker);
         picker.init(window, "Select File To Export To", nsIFilePicker.modeSave);
-        //picker.appendFilters(nsIFilePicker.filterAll|nsIFilePicker.filterXML);
         picker.appendFilter('XML Files', '*.xml');
         picker.appendFilter('All Files', '*');
         picker.defaultExtension - '.xml';
@@ -165,7 +163,6 @@ PreferencesController.prototype = {
         var nsIFilePicker = Components.interfaces.nsIFilePicker;
         var picker = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
         picker.init(window, "Select File To Import From", nsIFilePicker.modeOpen);
-        //picker.appendFilters(nsIFilePicker.filterAll|nsIFilePicker.filterXML);
         picker.appendFilter('XML Files', '*.xml');
         picker.appendFilter('All Files', '*');
         var resultOfPicker = picker.show();
@@ -194,7 +191,6 @@ PreferencesController.prototype = {
         var attackStringContainer = getAttackStringContainer();
         
         for (var i = 0; i < attacksTag.childNodes.length; i++){
-//             alert("'" + (attackTag.firstChild.firstChild.nodeName  == '#text')+"'");
             dump("::importAttacks()... (" + attacksTag + "== attacksTag) attacksTag[" + i + "] == " + attacksTag.childNodes[i] + "\n");
             if ("attack" === attacksTag.childNodes[i].nodeName){
                 attackTags.push(attacksTag.childNodes[i]);
@@ -277,6 +273,9 @@ PreferencesController.prototype = {
         var selectedIndex = listbox.selectedIndex;
         var selectedItemValue = listbox.selectedItem.value
         var selectedItemLabel = listbox.selectedItem.label;
+        if (listbox.selectedItem.previousSibling == null) { 
+            return false; 
+        } 
         var newValue = listbox.selectedItem.previousSibling.value;
         if (listbox.selectedItems.length != 1){
             alert("sorry, only one item can be moved at a time");
@@ -310,26 +309,40 @@ PreferencesController.prototype = {
     moveItemDown: function(container, listboxID){
         var listbox = document.getElementById(listboxID);
         var selectedIndex = listbox.selectedIndex;
+        var selectedItem = listbox.selectedItem; 
+        if (selectedIndex + 1 >= listbox.getRowCount()) { 
+            return true; 
+        }         
         var selectedItemValue = listbox.selectedItem.value
-        var selectedItemLabel = listbox.selectedItem.label;
+        var selectedItemLabel = listbox.selectedItem.label
+        if (listbox.selectedItem.nextSibling == null) { 
+            return false; 
+        } 
         var newValue = listbox.selectedItem.nextSibling.value;
         if (listbox.selectedItems.length != 1){
             alert("sorry, only one item can be moved at a time");
             return false;
         }
 
-        container.swap(listbox.selectedItem.value, 
-            listbox.selectedItem.nextSibling.value);
+        container.swap(listbox.selectedItem.value, listbox.selectedItem.nextSibling.value);
         container.save();
-        
-        listbox.ensureIndexIsVisible(selectedIndex  + 1);
         
         listbox.selectedItem.nextSibling.value = selectedItemValue
         
         listbox.removeItemAt(selectedIndex)
-        listbox.insertItemAt(selectedIndex+1, selectedItemLabel, newValue)
-        
-        listbox.selectedIndex = selectedIndex + 1;
+        if (selectedIndex + 1 >= listbox.getRowCount()) { 
+             
+            listbox.appendChild(selectedItem) 
+            listbox.selectedIndex = selectedIndex = listbox.getRowCount()-1; 
+             
+        } 
+        else { 
+            listbox.insertItemAt(selectedIndex+1, selectedItemLabel, newValue) 
+            listbox.selectedIndex = ++selectedIndex ; 
+        } 
+         
+        listbox.ensureIndexIsVisible(selectedIndex ); 
+         
         return true;
     }
 };

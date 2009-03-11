@@ -40,13 +40,16 @@ tools@securitycompass.com
                         instantApply='true'
                         type="int"/>
             <preference id="prefSidebarBuildingPause"
-			            name="extensions.sqlime.sidebarbuildingstop"
+			name="extensions.sqlime.sidebarbuildingstop"
                         instantApply='true'
-            			type="int" />
-	        <preference id="prefReportBuildingShowPass"
-			            name="extensions.sqlime.reportbuilding.showPass"
+			type="int" />
+	    <preference id="prefReportBuildingShowPass"
+			name="extensions.sqlime.reportbuilding.showPass"
                         instantApply='true'
-            			type="bool" />
+			type="bool" />
+	    <preference id="prefReportBuildingShowPass" 
+                        name="extensions.xssme.reportbuilding.showPass" 
+                        type="bool" /> 
         </preferences>
         <checkbox label="Show 'Open Sidebar' in context menu" preference="showContextMenu" />
 	<checkbox label="Show passed results in final report (Warning: long reports will cause heavy cpu load)" preference="prefReportBuildingShowPass" />

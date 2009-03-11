@@ -3,3 +3,6 @@ locale	sqlime	en-US	locale/en-US/
 skin	sqlime	classic/1.0	skin/
 overlay	chrome://browser/content/browser.xul	chrome://sqlime/content/overlay.xul
 style	chrome://global/content/customizeToolbar.xul	chrome://sqlime/skin/overlay.css
+# Firefox 2 & Firefox 3 differences
+override chrome://sqlime/content/preferences.js chrome://sqlime/content/preferences.fx2.js appversion<3.0
+override chrome://sqlime/content/preferences.js chrome://sqlime/content/preferences.fx3.js appversion>=3.0
