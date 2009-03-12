@@ -331,8 +331,7 @@ PreferencesController.prototype = {
         
         listbox.selectedItem.nextSibling.value = selectedItemValue
         
-        listbox.removeItemAt(selectedIndex)
-        if (selectedIndex + 1 >= listbox.getRowCount()) { 
+        if (selectedIndex + 2 >= listbox.getRowCount()) { 
              
             listbox.selectedItem = listbox.getItemAtIndex(listbox.getRowCount() -1) 
             this.moveItemUp(container, listboxID) 
@@ -341,6 +340,7 @@ PreferencesController.prototype = {
              
         } 
         else { 
+            listbox.removeItemAd(selectedIndex)
             listbox.insertItemAt(selectedIndex+1, selectedItemLabel, newValue) 
             listbox.selectedIndex = ++selectedIndex ; 
         } 
