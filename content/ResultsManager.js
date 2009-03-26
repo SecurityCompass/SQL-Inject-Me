@@ -297,7 +297,7 @@ ResultsManager.prototype = {
         rv += "<b>Submitted Form State:</b><br /><ul>";
         for (var key in testDataList) {
             if (testDataList[key].tested === false){
-                rv += "<li>" + (testDataList[Number(key)].name ? testDataList[Number(key)].name : "unnamed field") + ": ++" + testDataList[Number(key)].data+ "</li>";
+                rv += "<li>" + (testDataList[Number(key)].name ? testDataList[Number(key)].name : "unnamed field") + ": " + testDataList[Number(key)].data+ "</li>";
             }
             else {
                 testedDataKey = key;
