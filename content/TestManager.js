@@ -113,8 +113,6 @@ TestManager.prototype = {
             
         }
         
-        this.controller.finishedTest();
-        
         this.resultsStillExpected--;
     }
     ,

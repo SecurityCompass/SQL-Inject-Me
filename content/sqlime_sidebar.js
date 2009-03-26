@@ -214,7 +214,7 @@ extension.prototype = {
             return;
         }
         else {
-            testCount = fieldsToTest.length * testType.count * 2;
+            testCount = fieldsToTest.length * testType.count;
         }
         
         this.warningDialog = window.openDialog(

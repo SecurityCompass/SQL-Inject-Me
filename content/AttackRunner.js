@@ -131,10 +131,9 @@ AttackRunner.prototype = {
         
         var uri = ioService.newURI(formURL, null, null);
         Components.utils.reportError("got a " + uri.toString() + " from a " + formURL)
-        //var referingURI = ioService.newURI(formAction, null, null);
+        
         this.channel = ioService.newChannelFromURI(uri);
-        //this.channel.QueryInterface(Components.interfaces.nsIHttpChannel).
-        //       referrer = referingURI;
+        
         
         if (form.method.toLowerCase() == 'post'){
             var inputStream = Components.
@@ -150,5 +149,6 @@ AttackRunner.prototype = {
         
         streamListener.testData = this.testData;
         this.channel.asyncOpen(streamListener, null);
+        resultsManager.extensionManager.finishedTest();
     }
 }

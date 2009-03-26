@@ -68,7 +68,6 @@ ResultsManager.prototype = {
             this.fields[field.formIndex][field.index] = new FieldResult(field);
         }
         this.fields[field.formIndex][field.index].addResults(resultsWrapper.results);
-        this.extensionManager.finishedTest();
         if (this.sourceListeners.length === 0 && getTestRunnerContainer().testRunners.length === 0) {
             dump('\nall results logged now.')
             this.allResultsLogged = true;
