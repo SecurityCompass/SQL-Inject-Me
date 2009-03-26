@@ -340,7 +340,7 @@ PreferencesController.prototype = {
              
         } 
         else { 
-            listbox.removeItemAd(selectedIndex)
+            listbox.removeItemAt(selectedIndex)
             listbox.insertItemAt(selectedIndex+1, selectedItemLabel, newValue) 
             listbox.selectedIndex = ++selectedIndex ; 
         } 
