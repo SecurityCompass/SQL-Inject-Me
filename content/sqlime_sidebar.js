@@ -98,6 +98,10 @@ extension.prototype = {
         {
             
             rv.singleFormTest = true;
+            
+            if (tabbox.selectePanel == null) {
+                tabbox.selectedIndex = 0
+            }
 
             if ( tabbox.selectedPanel.
                 getElementsByAttribute('class', 'TestType').item(0).
@@ -458,7 +462,7 @@ extension.prototype = {
             labelinpanel.setAttribute("value", "Sorry, this page has no forms.");
             
             noformTab.setAttribute("label", "No Forms");
-
+            
             sidebarBuilder.add(tabs, noformTab);
             sidebarBuilder.add(tabpanels, noformPanel);
             sidebarBuilder.add(noformPanel, noformPanelVbox);
