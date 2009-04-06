@@ -88,15 +88,13 @@ AttackRunner.prototype = {
         this.fieldIndex = field.index;
         this.field = field;
         this.tabWrapper = tabWrapper
-
         
-        if (field)
-        {
+        
+        if (field) {
             formData = tabManager.getFormDataForURL(formIndex, field.index, 
                     testData.string);
         }
-        else 
-        {
+        else {
             formData = tabManager.getFormDataForURL(formIndex, null, testData.string);
         }
         this.testData = tabManager.getTabData(formIndex, field.index, testData.string);
@@ -124,6 +122,7 @@ AttackRunner.prototype = {
         if (form.method.toLowerCase() != 'post'){
             formAction += formAction.indexOf('?') === -1 ? '?' : '&';
             formAction += formData;
+            formURL = formAction;
         } 
         
         dump('attackrunner::do_source_test::formAction == ' + formAction + '\n');
