@@ -99,7 +99,7 @@ extension.prototype = {
             
             rv.singleFormTest = true;
             
-            if (tabbox.selectePanel == null) {
+            if (tabbox.selectedPanel == null) {
                 tabbox.selectedIndex = 0
             }
 
