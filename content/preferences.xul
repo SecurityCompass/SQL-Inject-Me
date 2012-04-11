@@ -68,6 +68,7 @@ tools@securitycompass.com
     <prefpane label="SQL Injection Strings" id="sqlistrings">
         <preferences>
         </preferences>
+        <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/sqlime.js" />
         <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/json.js" />
         <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/io.js" />
         <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/util.js" />

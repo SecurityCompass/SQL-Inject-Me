@@ -41,12 +41,12 @@ AttackStringContainer.prototype.init = function (){
         this.prefBranch = this.prefService.getBranch('extensions.sqlime.');
         this.prefDefaultBranch = this.prefService.getDefaultBranch('extensions.sqlime.')
         attackStrings = this.prefBranch.getCharPref('attacks');
-        this.strings = JSON.fromString(attackStrings);
+        this.strings = sqlime.JSON.fromString(attackStrings);
 
         
     };
 AttackStringContainer.prototype.save = function() {
-    this.prefBranch.setCharPref('attacks', JSON.toString(this.strings));
+    this.prefBranch.setCharPref('attacks', sqlime.JSON.toString(this.strings));
     
 }
 

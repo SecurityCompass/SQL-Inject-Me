@@ -31,6 +31,7 @@ If you have any questions regarding SQL Inject Me please contact
 tools@securitycompass.com
 -->
 
+<script type="application/x-javascript" src="chrome://sqlime/content/sqlime.js" />
 <script type="application/x-javascript" src="chrome://sqlime/content/json.js" />
 <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/preferenceStringContainer.js" />
 <script type="application/x-javascript;version=1.7" src="chrome://sqlime/content/ErrorStringContainer.js" />

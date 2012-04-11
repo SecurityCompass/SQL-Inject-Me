@@ -62,7 +62,7 @@
 //   silently dropped but always lead to a TypeError.
 // * An optional key blacklist has been added to JSON.toString
 
-var JSON = {
+sqlime.JSON = {
   /**
     * Converts a JavaScript object into a JSON string.
     *

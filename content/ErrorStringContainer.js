@@ -35,13 +35,13 @@ ErrorStringContainer.prototype.init = function (){
         
     this.prefBranch = this.prefService.getBranch('extensions.sqlime.');
     attackStrings = this.prefBranch.getCharPref('errorstrings');
-    this.strings = JSON.fromString(attackStrings);
+    this.strings = sqlime.JSON.fromString(attackStrings);
 };
 
 ErrorStringContainer.prototype.save = function() {
         dump('ErrorStringContainer::save this.strings ' +this.strings + '\n');
         dump('ErrorStringContainer::save typeof(this.strings) ' +typeof( this.strings )+ '\n');
-        this.prefBranch.setCharPref('errorstrings', JSON.toString(this.strings));
+        this.prefBranch.setCharPref('errorstrings', sqlime.JSON.toString(this.strings));
 }
     
 
