@@ -4,7 +4,7 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>sqlime@security.compass</em:id>
     <em:name>SQL Inject Me</em:name>
-    <em:version>trunk</em:version>
+    <em:version>0.4.7</em:version>
     <em:creator>Security Compass</em:creator>
     <em:contributor>Sam Chapin, sc@samchapin.com</em:contributor>
     <em:description>An extension to test for SQL injection vulnerabilities</em:description>
